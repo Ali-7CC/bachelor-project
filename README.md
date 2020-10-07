@@ -1,1 +1,1 @@
-# bachelor-project
+# Bachelor Project: Development of a Web-Based Application for Visualization of Process Data
