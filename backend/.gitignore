@@ -1,0 +1,12 @@
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+# Mac
+.vscode/
+*.DS_Store
+
+# Maven
+target/
