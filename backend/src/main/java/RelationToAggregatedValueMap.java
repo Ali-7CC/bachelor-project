@@ -4,6 +4,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Holds the aggregated form of the RelationToValuesMap.
@@ -30,16 +31,26 @@ public class RelationToAggregatedValueMap {
      * @return The JSONObject with the key "links" and a JSONArray as a value which contains what's described above.
      */
     public JSONObject toJSON() {
+        // Making the nodes JSONArray
+        List<String> nodesList = this.map.keySet().stream().flatMap(l -> l.stream()).distinct().collect(Collectors.toList());
+        JSONArray nodes = new JSONArray();
+        for(String n : nodesList){
+            JSONObject nodeObj = new JSONObject();
+            nodeObj.put("name",n);
+            nodes.put(nodeObj);
+        }
+        // Making the links JSONArray
         JSONArray links = new JSONArray();
         for (Map.Entry<List<String>, Double> entry : this.map.entrySet()) {
-            JSONObject obj = new JSONObject();
-            obj.put("source", entry.getKey().get(0));
-            obj.put("target", entry.getKey().get(1));
-            obj.put("value", entry.getValue());
-            links.put(obj);
+            JSONObject linkObj = new JSONObject();
+            linkObj.put("source", entry.getKey().get(0));
+            linkObj.put("target", entry.getKey().get(1));
+            linkObj.put("value", entry.getValue());
+            links.put(linkObj);
         }
         JSONObject result = new JSONObject();
         result.put("links", links);
+        result.put("nodes",nodes);
         return result;
     }
 

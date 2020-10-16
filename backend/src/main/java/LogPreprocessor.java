@@ -66,6 +66,8 @@ public class LogPreprocessor {
                 double value = Double.NaN;
                 if (operator.equals("SUM")) {
                     value = AttributeOperations.sum(sourceAttribute, targetAttribute);
+                } else if (operator.equals("DIFF")) {
+                    value = AttributeOperations.diff(sourceAttribute, targetAttribute);
                 } else if (operator.equals("COUNT")) {
                     value = 1.0;
                 }
