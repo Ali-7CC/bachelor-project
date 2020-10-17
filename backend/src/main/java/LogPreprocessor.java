@@ -11,7 +11,101 @@ public class LogPreprocessor {
     }
 
     /**
-     * Iterates through a trace and populates the relationToValuesMap with entries in the form
+     * Finds all variants in an event log by looking at the sequence of activities in each trace
+     *
+     * @param log Event log of type XLog containing one <log> element.
+     * @return An object of type activityVariantMap which holds a map of the variants
+     */
+    public activityVariantMap findVariants(XLog log) {
+        activityVariantMap variants = new activityVariantMap();
+        for (XTrace trace : log) {
+            List<XAttribute> sequence = new ArrayList<>();
+            for (XEvent event : trace) {
+                XAttribute activity = event.getAttributes().get("Activity");
+                sequence.add(activity);
+            }
+            variants.update(sequence, trace);
+        }
+
+        return variants;
+    }
+
+
+    public RelationToValuesMap relationToValues(ActivityVariant variant, String attrKey, String operator,
+                                                RelationToValuesMap relationToValuesMap) {
+        for (XTrace trace : variant.traces) {
+            // If variant has 1 event only
+            if (trace.size() <= 1) {
+                if (!operator.equals("COUNT")) return relationToValuesMap;
+                // Creating the link
+                XEvent event = trace.get(0);
+                XAttribute eventAttr = event.getAttributes().get(attrKey);
+                List<String> link = new ArrayList<>();
+                link.add(eventAttr.toString() + "_0_" + variant.ID);
+                link.add("$");
+                // The value (1.0 is the only valid value)
+                double value = 1.0;
+                // Adding the relation to the map
+                if (relationToValuesMap.map.containsKey(link)) {
+                    List<Double> values = relationToValuesMap.map.get(link);
+                    values.add(1.0);
+                    relationToValuesMap.map.put(link, values);
+                } else {
+                    List<Double> values = new ArrayList<>();
+                    values.add(1.0);
+                    relationToValuesMap.map.put(link, values);
+                }
+
+                return relationToValuesMap;
+            }
+
+            // If the trace has 2 or more events
+            else {
+                // Iterating over events
+                for (int i = 0; i < trace.size() - 1; i++) {
+                    XEvent sourceEvent = trace.get(i);
+                    XEvent targetEvent = trace.get(i + 1);
+                    XAttribute sourceAttribute = sourceEvent.getAttributes().get(attrKey);
+                    XAttribute targetAttribute = targetEvent.getAttributes().get(attrKey);
+
+                    // Creating the link using activity name
+                    List<String> link = new ArrayList<>();
+                    link.add(sourceAttribute.toString() + "_" + i + "_" + variant.ID);
+                    link.add(targetAttribute.toString() + "_" + (i + 1) + "_" + variant.ID);
+
+                    // Computing the value
+                    double value = Double.NaN;
+                    if (operator.equals("SUM")) {
+                        value = AttributeOperations.sum(sourceAttribute, targetAttribute);
+                    } else if (operator.equals("DIFF")) {
+                        value = AttributeOperations.diff(sourceAttribute, targetAttribute);
+                    } else if (operator.equals("COUNT")) {
+                        value = 1.0;
+                    }
+
+                    // Adding the relation to the map
+                    if (relationToValuesMap.map.containsKey(link)) {
+                        List<Double> values = relationToValuesMap.map.get(link);
+                        values.add(value);
+                        relationToValuesMap.map.put(link, values);
+                    } else {
+                        List<Double> values = new ArrayList<>();
+                        values.add(value);
+                        relationToValuesMap.map.put(link, values);
+                    }
+                }
+
+
+            }
+        }
+        return relationToValuesMap;
+
+
+    }
+
+
+    /**
+     * Iterates through a trace and populates the RelationToValuesMap with entries in the form
      * [attribute 1, attribute 2] --> [double 1, double 2,..] based on the chosen attribute and
      * the chosen operation to preform on their values.
      *
@@ -21,7 +115,7 @@ public class LogPreprocessor {
      * @param relationToValuesMap The HashMap that gets populated with the above described entries.
      * @return A RelationToValuesMap HashMap with the new entries extracted from the trace.
      */
-    public RelationToValuesMap relationToValues(XTrace trace, String attrKey, String operator,
+/*    public RelationToValuesMap relationToValues(XTrace trace, String attrKey, String operator,
                                                 RelationToValuesMap relationToValuesMap) {
         // If trace has 1 event only
         if (trace.size() <= 1) {
@@ -89,6 +183,6 @@ public class LogPreprocessor {
 
         }
 
-    }
+    }*/
 }
 

@@ -1,8 +1,8 @@
 fetch('data.json').then(response => response.json()).then(data => {
 
     // Defining the width and height of the viewBox
-    const width = 900;
-    const height = 600;
+    const width = 1000;
+    const height = 700;
 
     // Appending an element svg to a container in the HTML
     const svg = d3.select('#sankey-container')
@@ -13,7 +13,7 @@ fetch('data.json').then(response => response.json()).then(data => {
     // Create the Sankey generator with some settings
     const sankeyGenerator = d3.sankey()
                             .nodeId(d => d.name)
-                            .nodeWidth(15)
+                            .nodeWidth(50)
                             .nodePadding(10)
                             .extent([[1, 5], [width - 1, height - 5]]);
 
@@ -51,7 +51,7 @@ fetch('data.json').then(response => response.json()).then(data => {
     // Adding names to the nodes
     svg.append("g")
     .attr("font-family", "sans-serif")
-    .attr("font-size", 10)
+    .attr("font-size", 6)
     .selectAll("text")
     .data(graph.nodes)
     .join("text")
