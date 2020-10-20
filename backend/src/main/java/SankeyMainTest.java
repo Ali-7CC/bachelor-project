@@ -1,9 +1,15 @@
 import org.deckfour.xes.in.XesXmlParser;
+import org.deckfour.xes.model.XAttribute;
+import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
+import org.deckfour.xes.model.XTrace;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SankeyMainTest {
     public static void main(String[] args) throws Exception {
@@ -15,15 +21,41 @@ public class SankeyMainTest {
         XesXmlParser parser = new XesXmlParser();
         List<XLog> logs = parser.parse(file);
         XLog callCenterLog = logs.get(0);
+/*        LogPreprocessor preprocessor = new LogPreprocessor(callCenterLog);
+        List<List<XTrace>> lists = new ArrayList<>();
+        HashMap<Integer, List<List<XTrace>>> groups = new HashMap<>();*/
+/*        lists.add(callCenterLog);
+        int counter = 0;
 
-
+        do{
+            List<Object> results = preprocessor.findGroups(lists.get(0), groups,counter);
+            lists = (List<XTrace>) results.get(0);
+            groups = (HashMap<Integer, List<List<XTrace>>>) results.get(1);
+            counter++;
+        } while(!lists.isEmpty());*/
+/*        for(XTrace trace : callCenterLog){
+            System.out.println(trace.getAttributes().get("concept:name") + " : " + trace.size());
+        }*/
+/*        groups = preprocessor.findGroups(callCenterLog);
+        for(Map.Entry<Integer, List<List<XTrace>>> entry : groups.entrySet()){
+            List<List<XTrace>> group = entry.getValue();
+            List<List<XAttribute>> g = group.stream().map(lt -> lt.stream().map(t -> t.getAttributes().get("concept:name")).collect(Collectors.toList())).collect(Collectors.toList());
+            System.out.println("MATCHES: " +  entry.getKey() + "  GROUPS: " + g);
+        }*/
 
         // Processing
         LogPreprocessor preprocessor = new LogPreprocessor(callCenterLog);
-        activityVariantMap variants =  preprocessor.findVariants(callCenterLog);
-        RelationToValuesMap RelationToValuesMap = new RelationToValuesMap("Activity", "COUNT");
-        for(Map.Entry<String, ActivityVariant> entry : variants.variants.entrySet()){
-            RelationToValuesMap = preprocessor.relationToValues(entry.getValue(), "Activity", "COUNT",
+        TraceGroups groups = preprocessor.groups;
+        for(Map.Entry<Integer, List<List<XTrace>>> entry : groups.map.entrySet()) {
+            List<List<XTrace>> group = entry.getValue();
+            List<List<XAttribute>> g = group.stream().map(lt -> lt.stream().map(t -> t.getAttributes().get("concept:name")).collect(Collectors.toList())).collect(Collectors.toList());
+            System.out.println("MATCHES: " + entry.getKey() + "  GROUPS: " + g);
+        }
+
+
+            RelationToValuesMap RelationToValuesMap = new RelationToValuesMap("Activity", "COUNT");
+        for(XTrace trace : callCenterLog){
+            RelationToValuesMap = preprocessor.relationToValues(trace ,"Activity", "COUNT",
                     RelationToValuesMap);
         }
 

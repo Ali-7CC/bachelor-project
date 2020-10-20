@@ -2,7 +2,8 @@ import java.util.*;
 
 
 /**
- * Class that represents the set of mappings that have the following form: (eventName 1, eventName 2) --> Double
+ * Class that represents the set of mappings that have the following form:
+ * (eventName 1, eventName 2) --> [Double 1, Double 2, ..]
  * The semantic of the double depends two factors:
  * 1) The chosen event attribute, e.g. time:timestamp
  * 2) The operation applied to the values of the chosen attribute, e.g. difference
