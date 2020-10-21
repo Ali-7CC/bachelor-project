@@ -3,224 +3,112 @@ import org.deckfour.xes.model.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class LogPreprocessor {
     XLog log;
-    TraceGroups groups;
+    TraceGroupsMap groups;
 
     public LogPreprocessor(XLog log) {
         this.log = log;
-        this.groups = findGroups(this.log);
-    }
-
-
-    public TraceGroups findGroups(List<XTrace> log) {
-        HashMap<Integer, List<List<XTrace>>> groupsMap = new HashMap<>();
-        List<List<XTrace>> master = new ArrayList<>();
-        master.add(log);
-        int position = 0;
-        while (!master.isEmpty()) {
-            List<List<XTrace>> newMaster = new ArrayList<>();
-            for (List<XTrace> traces : master) {
-                List<List<XTrace>> newGroups = groupBynthActivity(traces, position);
-                for (List<XTrace> newGroup : newGroups) {
-                    if (newGroup.size() > 1) {
-                        if (groupsMap.containsKey(position)) {
-                            List<List<XTrace>> traceGroup = groupsMap.get(position);
-                            traceGroup.add(newGroup);
-                            groupsMap.put(position, traceGroup);
-                        } else {
-                            List<List<XTrace>> newTraceGroup = new ArrayList<>();
-                            newTraceGroup.add(newGroup);
-                            groupsMap.put(position, newTraceGroup);
-                        }
-                        newMaster.add(newGroup);
-
-                    }
-
-
-                }
-
-
-            }
-            master = newMaster;
-            position++;
-        }
-        TraceGroups traceGroups = new TraceGroups();
-        traceGroups.map = groupsMap;
-        return traceGroups;
-
-
-    }
-
-
-
-
- /*   public List<Object> findGroups(List<XTrace> lists, HashMap<Integer, List<List<XTrace>>> groupsMap,
-                                                          int position){
-        List<List<XTrace>> newGroups = groupBynthActivity(lists,position);
-        List<List<XTrace>> toBeRemoved = new ArrayList<>();
-        for(List<XTrace> newGroup : newGroups){
-            // If the new group is a single
-            if(newGroup.size() <= 1){
-                if (groupsMap.containsKey(position)) {
-                    List<List<XTrace>> traceGroup = groupsMap.get(position);
-                    traceGroup.add(newGroup);
-                    groupsMap.put(position, traceGroup);
-                    toBeRemoved.add(newGroup);
-                } else {
-                    List<List<XTrace>> newTraceGroup = new ArrayList<>();
-                    newTraceGroup.add(newGroup);
-                    groupsMap.put(position, newTraceGroup);
-                }
-
-            }
-        }
-        for(List<XTrace> traceList : toBeRemoved){
-            newGroups.remove(traceList);
-        }
-        List<Object> result = new ArrayList<>();
-        result.add(newGroups);
-        result.add(groupsMap);
-
-        return result;
-
-
-    }*/
-
-/*    public HashMap<Integer, List<List<XTrace>>> findGroups(List<XTrace> log){
-        HashMap<Integer, List<List<XTrace>>> matches = new HashMap<>();
-        int counter = 0;
-        List<List<XTrace>> groups = new ArrayList<>();
-        groups.add(log);
-        while(!groups.isEmpty()){
-            List<List<XTrace>> removed = new ArrayList<>();
-            for(List<XTrace> group : groups){
-                // Divide
-                List<List<XTrace>> dividedGroups = groupBynthActivity(group,counter);
-                for (List<XTrace> dividedGroup : dividedGroups) {
-                    if (dividedGroup.size() <= 1) {
-                        if (matches.containsKey(counter)) {
-                            List<List<XTrace>> newGroup = matches.get(counter);
-                            newGroup.add(dividedGroup);
-                            matches.put(counter, newGroup);
-                        } else {
-                            List<List<XTrace>> newGroup = new ArrayList<>();
-                            newGroup.add(dividedGroup);
-                            matches.put(counter, newGroup);
-                        }
-                        removed.add(dividedGroup);
-                    } else {
-                        if (matches.containsKey(counter + 1)) {
-                            List<List<XTrace>> newGroup = matches.get(counter + 1);
-                            newGroup.add(dividedGroup);
-                            matches.put(counter + 1, newGroup);
-                        } else {
-                            List<List<XTrace>> newGroup = new ArrayList<>();
-                            newGroup.add(dividedGroup);
-                            matches.put(counter + 1, newGroup);
-                        }
-
-                    }
-
-                }
-
-
-            }
-            for (List<XTrace> gg : removed) {
-                groups.remove(gg);
-            }
-
-            counter++;
-
-        }
-        return matches;
-
-    }*/
-
-
-
-/*    public TraceGroupMap findGroups(List<XTrace> log){
-        TraceGroupMap map = new TraceGroupMap();
-        int commons = 0;
-        List<List<XTrace>> groups = groupByFirstActivity(log);
-        while(!groups.isEmpty()){
-            List<List<XTrace>> singleGroups = groups.stream().filter(g -> g.size() <= 1).collect(Collectors.toList());
-            for(List<XTrace> singleGroup : singleGroups){
-                XTrace trace = singleGroup.get(0);
-                map.addGroup(trace, commons);
-                groups.remove(singleGroup);
-            }
-            List<List<XTrace>> newGroups = groups.stream().filter(g -> g.size() > 1).collect(Collectors.toList());
-            for(List<XTrace> newGroup : newGroups){
-                List<List<XTrace>> divided = groupByFirstActivity(newGroup);
-                for(List<XTrace> dividedGroup : divided){
-                    dividedGroup.stream().forEach(t -> t.remove(0));
-                    dividedGroup.stream().
-                    groups.add(dividedGroup);
-                }
-            }
-            System.out.println(commons);
-            commons++;
-
-
-        }
-        return map;
-    }*/
-
-/*    public TraceGroupMap findGroups(List<XTrace> log) {
-        TraceGroupMap map = new TraceGroupMap();
-        int commons = 0;
-        List<List<XTrace>> groups = groupByFirstActivity(log);
-
-        while(!groups.isEmpty()){
-            for(List<XTrace> group : groups){
-                if(group.size() <= 1){
-                    map.addGroup(group.get(0), commons);
-                    groups.remove(group);
-                } else{
-                    List<List<XTrace>> newGroups = groupByFirstActivity(group);
-
-                }
-            }
-
-        }
-        return map;
-    }*/
-
-    public List<List<XTrace>> groupBynthActivity(List<XTrace> log, int n) {
-        List<List<XTrace>> groups = new ArrayList<>();
-        List<XTrace> multis = new ArrayList<>();
-        for (XTrace trace : log) {
-            if (trace.size() <= n) {
-                List<XTrace> single = new ArrayList<>();
-                single.add(trace);
-                groups.add(single);
-            } else {
-                multis.add(trace);
-            }
-        }
-        List<List<XTrace>> matchings = multis.stream().collect(Collectors
-                .groupingBy(trace -> trace.get(n).getAttributes().get("Activity")))
-                .values().stream().collect(Collectors.toList());
-
-        for (List<XTrace> group : matchings) {
-            groups.add(group);
-        }
-        return groups;
     }
 
 
     /**
-     * Finds all variants in an event log by looking at the sequence of activities in each trace
+     * Finds the TraceGroups for a given event log and returns a TraceGroupsMap with the found trace groups.
+     *
+     * @param log An event log of type XLog or List<XTrace>
+     * @return A TraceGroupMap that maps the index to which the traces share their first activities to
+     * the list of TraceGroup
+     */
+    public TraceGroupsMap findTraceGroups(List<XTrace> log) {
+        HashMap<Integer, List<TraceGroup>> groupsMap = new HashMap<>();
+        List<TraceGroup> groupsMaster = new ArrayList<>();
+        TraceGroup initialGroup = new TraceGroup();
+        initialGroup.traces = log;
+        groupsMaster.add(initialGroup);
+        int position = 0;
+        while (!groupsMaster.isEmpty()) {
+            List<TraceGroup> newMaster = new ArrayList<>();
+            for (TraceGroup group : groupsMaster) {
+                List<TraceGroup> newGroups = groupBynthActivity(group, position);
+                for (TraceGroup newGroup : newGroups) {
+                    if (newGroup.traces.size() > 1) {
+                        // Updating the groupsMap with the new groups
+                        if (groupsMap.containsKey(position)) {
+                            List<TraceGroup> traceGroups = groupsMap.get(position);
+                            traceGroups.add(newGroup);
+                            groupsMap.put(position, traceGroups);
+                        } else {
+                            List<TraceGroup> newTraceGroups = new ArrayList<>();
+                            newTraceGroups.add(newGroup);
+                            groupsMap.put(position, newTraceGroups);
+                        }
+                        // Adding the new groups to the newMaster so they can be divided further
+                        newMaster.add(newGroup);
+                    }
+                }
+            }
+            groupsMaster = newMaster;
+            position++;
+        }
+        TraceGroupsMap traceGroupsMap = new TraceGroupsMap();
+        traceGroupsMap.map = groupsMap;
+        return traceGroupsMap;
+    }
+
+
+    /**
+     * Divides a given TraceGroup into more refined trace groups.
+     * i.e. if the given TraceGroup shares activities up to index 3,
+     * The returned list of groups that contain >=2 traces share activities up to index 4.
+     *
+     * @param group The TraceGroup to be divided/refined
+     * @param n     The index that the grouping is based on, which equals the current index
+     *              of the given TraceGroup + 1
+     * @return A list of TraceGroup. Each TraceGroup in that list that contains 2 or more traces share
+     * the first n activities.
+     */
+    public List<TraceGroup> groupBynthActivity(TraceGroup group, int n) {
+        // Initializing the list to be returned
+        List<TraceGroup> traceGroups = new ArrayList<>();
+        // Traces that are shorter or equal to n are immediately made into a new TraceGroup and added to the
+        // list to be returned. Longer traces are kept for the grouping.
+        TraceGroup longGroups = new TraceGroup();
+        for (XTrace trace : group.traces) {
+            if (trace.size() <= n) {
+                TraceGroup shortGroup = new TraceGroup();
+                shortGroup.traces.add(trace);
+                traceGroups.add(shortGroup);
+            } else {
+                longGroups.traces.add(trace);
+            }
+        }
+        // Grouping the longer traces
+        List<List<XTrace>> groups = longGroups.traces.stream().collect(Collectors
+                .groupingBy(trace -> trace.get(n).getAttributes().get("Activity")))
+                .values().stream().collect(Collectors.toList());
+
+        // Constructing the new trace groups that share their activities up to index n.
+        for (List<XTrace> newGroup : groups) {
+            TraceGroup newTraceGroup = new TraceGroup();
+            newTraceGroup.traces = newGroup;
+            newTraceGroup.index = n;
+            traceGroups.add(newTraceGroup);
+        }
+
+        return traceGroups;
+    }
+
+
+    /**
+     * Finds all variants in an event log by looking at the sequence of activities in each trace.
      *
      * @param log Event log of type XLog containing one <log> element.
-     * @return An object of type activityVariantMap which holds a map of the variants
+     * @return An object of type ActivityVariantMap which holds a map of the variants
      */
-    public activityVariantMap findVariants(XLog log) {
-        activityVariantMap variants = new activityVariantMap();
+    public ActivityVariantMap findVariants(XLog log) {
+        ActivityVariantMap variants = new ActivityVariantMap();
         for (XTrace trace : log) {
             List<XAttribute> sequence = new ArrayList<>();
             for (XEvent event : trace) {
@@ -232,81 +120,6 @@ public class LogPreprocessor {
 
         return variants;
     }
-
-
-/*    public RelationToValuesMap relationToValues(XTrace trace, String attrKey, String operator,
-                                                RelationToValuesMap relationToValuesMap) {
-        for (XTrace trace : log) {
-            // If variant has 1 event only
-            if (trace.size() <= 1) {
-                if (!operator.equals("COUNT")) return relationToValuesMap;
-                // Creating the link
-                XEvent event = trace.get(0);
-                XAttribute eventAttr = event.getAttributes().get(attrKey);
-                List<String> link = new ArrayList<>();
-                String groupName = this.groups.getGroupName(trace,1);
-                link.add(eventAttr.toString() + "_0_" + groupName);
-                link.add("$");
-                // The value (1.0 is the only valid value)
-                double value = 1.0;
-                // Adding the relation to the map
-                if (relationToValuesMap.map.containsKey(link)) {
-                    List<Double> values = relationToValuesMap.map.get(link);
-                    values.add(1.0);
-                    relationToValuesMap.map.put(link, values);
-                } else {
-                    List<Double> values = new ArrayList<>();
-                    values.add(1.0);
-                    relationToValuesMap.map.put(link, values);
-                }
-
-                return relationToValuesMap;
-            }
-
-            // If the trace has 2 or more events
-            else {
-                // Iterating over events
-                for (int i = 0; i < trace.size() - 1; i++) {
-                    XEvent sourceEvent = trace.get(i);
-                    XEvent targetEvent = trace.get(i + 1);
-                    XAttribute sourceAttribute = sourceEvent.getAttributes().get(attrKey);
-                    XAttribute targetAttribute = targetEvent.getAttributes().get(attrKey);
-
-                    // Creating the link using activity name
-                    List<String> link = new ArrayList<>();
-                    String groupName = this.groups.getGroupName(trace, i+1);
-                    link.add(sourceAttribute.toString() + "_" + i + "_" + groupName);
-                    link.add(targetAttribute.toString() + "_" + (i + 1) + "_" + groupName);
-
-                    // Computing the value
-                    double value = Double.NaN;
-                    if (operator.equals("SUM")) {
-                        value = AttributeOperations.sum(sourceAttribute, targetAttribute);
-                    } else if (operator.equals("DIFF")) {
-                        value = AttributeOperations.diff(sourceAttribute, targetAttribute);
-                    } else if (operator.equals("COUNT")) {
-                        value = 1.0;
-                    }
-
-                    // Adding the relation to the map
-                    if (relationToValuesMap.map.containsKey(link)) {
-                        List<Double> values = relationToValuesMap.map.get(link);
-                        values.add(value);
-                        relationToValuesMap.map.put(link, values);
-                    } else {
-                        List<Double> values = new ArrayList<>();
-                        values.add(value);
-                        relationToValuesMap.map.put(link, values);
-                    }
-                }
-
-
-            }
-        }
-        return relationToValuesMap;
-
-
-    }*/
 
 
     /**
@@ -329,7 +142,7 @@ public class LogPreprocessor {
             XEvent event = trace.get(0);
             XAttribute eventAttr = event.getAttributes().get(attrKey);
             List<String> link = new ArrayList<String>();
-            String groupName = this.groups.getGroupName(trace, 0);
+            String groupName = this.groups.makeGroupName(trace, 0);
 
             link.add(eventAttr.toString() + "_0_" + "(" + groupName + ")");
             link.add("$");
@@ -360,8 +173,8 @@ public class LogPreprocessor {
 
                 // Creating the link using activity name
                 List<String> link = new ArrayList<>();
-                String sourceGroupName = this.groups.getGroupName(trace, i);
-                String targetGroupName = this.groups.getGroupName(trace, i+1);
+                String sourceGroupName = this.groups.makeGroupName(trace, i);
+                String targetGroupName = this.groups.makeGroupName(trace, i + 1);
 
                 link.add(sourceAttribute.toString() + "_" + (i) + "_" + "(" + sourceGroupName + ")");
                 link.add(targetAttribute.toString() + "_" + (i + 1) + "_" + "(" + targetGroupName + ")");
