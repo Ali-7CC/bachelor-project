@@ -133,7 +133,7 @@ public class LogPreprocessor {
      * @param relationToValuesMap The HashMap that gets populated with the above described entries.
      * @return A RelationToValuesMap HashMap with the new entries extracted from the trace.
      */
-    public RelationToValuesMap relationToValues(XTrace trace, String attrKey, String operator,
+    public RelationToValuesMap relationToValues(XTrace trace, String attrKey, String operator, boolean grouping,
                                                 RelationToValuesMap relationToValuesMap) {
         // If trace has 1 event only
         if (trace.size() <= 1) {
@@ -141,22 +141,27 @@ public class LogPreprocessor {
             // Creating the link
             XEvent event = trace.get(0);
             XAttribute eventAttr = event.getAttributes().get(attrKey);
-            List<String> link = new ArrayList<String>();
-            String groupName = this.groups.makeGroupName(trace, 0);
-
-            link.add(eventAttr.toString() + "_0_" + "(" + groupName + ")");
-            link.add("$");
+            Relation relation = new Relation();
+            relation.events.add(event);
+            relation.events.add(null);
+            if(grouping){
+                String groupName = this.groups.makeGroupName(trace, 0);
+                relation.eventNames.add(eventAttr.toString() + "_0_" + "(" + groupName + ")");
+            } else{
+                relation.eventNames.add(eventAttr.toString() + "_0");
+            }
+            relation.eventNames.add("End");
             // The value (1.0 is the only valid value)
             double value = 1.0;
             // Adding the relation to the map
-            if (relationToValuesMap.map.containsKey(link)) {
-                List<Double> values = relationToValuesMap.map.get(link);
+            if (relationToValuesMap.map.containsKey(relation)) {
+                List<Double> values = relationToValuesMap.map.get(relation);
                 values.add(1.0);
-                relationToValuesMap.map.put(link, values);
+                relationToValuesMap.map.put(relation, values);
             } else {
                 List<Double> values = new ArrayList<>();
                 values.add(1.0);
-                relationToValuesMap.map.put(link, values);
+                relationToValuesMap.map.put(relation, values);
             }
 
             return relationToValuesMap;
@@ -172,12 +177,18 @@ public class LogPreprocessor {
                 XAttribute targetAttribute = targetEvent.getAttributes().get(attrKey);
 
                 // Creating the link using activity name
-                List<String> link = new ArrayList<>();
-                String sourceGroupName = this.groups.makeGroupName(trace, i);
-                String targetGroupName = this.groups.makeGroupName(trace, i + 1);
-
-                link.add(sourceAttribute.toString() + "_" + (i) + "_" + "(" + sourceGroupName + ")");
-                link.add(targetAttribute.toString() + "_" + (i + 1) + "_" + "(" + targetGroupName + ")");
+                Relation relation = new Relation();
+                relation.events.add(sourceEvent);
+                relation.events.add(targetEvent);
+                if(grouping){
+                    String sourceGroupName = this.groups.makeGroupName(trace, i);
+                    String targetGroupName = this.groups.makeGroupName(trace, i + 1);
+                    relation.eventNames.add(sourceAttribute.toString() + "_" + (i) + "_" + "(" + sourceGroupName + ")");
+                    relation.eventNames.add(targetAttribute.toString() + "_" + (i + 1) + "_" + "(" + targetGroupName + ")");
+                } else{
+                    relation.eventNames.add(sourceAttribute.toString() + "_" + (i));
+                    relation.eventNames.add(targetAttribute.toString() + "_" + (i + 1));
+                }
 
                 // Computing the value
                 double value = Double.NaN;
@@ -190,14 +201,14 @@ public class LogPreprocessor {
                 }
 
                 // Adding the relation to the map
-                if (relationToValuesMap.map.containsKey(link)) {
-                    List<Double> values = relationToValuesMap.map.get(link);
+                if (relationToValuesMap.map.containsKey(relation)) {
+                    List<Double> values = relationToValuesMap.map.get(relation);
                     values.add(value);
-                    relationToValuesMap.map.put(link, values);
+                    relationToValuesMap.map.put(relation, values);
                 } else {
                     List<Double> values = new ArrayList<>();
                     values.add(value);
-                    relationToValuesMap.map.put(link, values);
+                    relationToValuesMap.map.put(relation, values);
                 }
             }
 

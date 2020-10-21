@@ -3,14 +3,14 @@ import java.util.*;
 
 /**
  * Class that represents the set of mappings that have the following form:
- * (eventName 1, eventName 2) --> [Double 1, Double 2, ..]
+ * Relation --> [Double 1, Double 2, ..]
  * The semantic of the double depends two factors:
- * 1) The chosen event attribute, e.g. time:timestamp
+ * 1) The chosen event attribute, e.g. Activity, time:timestamp, etc.
  * 2) The operation applied to the values of the chosen attribute, e.g. difference
  */
 public class RelationToValuesMap {
     // The HashMap made by the LogPreprocessor
-    public HashMap<List<String>, List<Double>> map;
+    public HashMap<Relation, List<Double>> map;
     // The attribute key and operator that were used to create the HashMap
     String attrKey;
     String operator;
@@ -27,9 +27,9 @@ public class RelationToValuesMap {
      * @return Object of type RelationToAggregatedValueMap that holds the relations and their aggregated values i.a.
      */
     public RelationToAggregatedValueMap aggregateSum() {
-        HashMap<List<String>, Double> result = new HashMap<>();
+        HashMap<Relation, Double> result = new HashMap<>();
         // Iterating through entries of this.map
-        for (Map.Entry<List<String>, List<Double>> entry : this.map.entrySet()) {
+        for (Map.Entry<Relation, List<Double>> entry : this.map.entrySet()) {
             // Populating the result HashMap with the relation and its summed values
             result.put(entry.getKey(), entry.getValue().stream().mapToDouble(v -> v).sum());
         }
@@ -45,9 +45,9 @@ public class RelationToValuesMap {
      * @return Object of type RelationToAggregatedValueMap that holds the relations and their aggregated values i.a.
      */
     public RelationToAggregatedValueMap aggregateMin() {
-        HashMap<List<String>, Double> result = new HashMap<>();
+        HashMap<Relation, Double> result = new HashMap<>();
         // Iterating through entries of this.map
-        for (Map.Entry<List<String>, List<Double>> entry : this.map.entrySet()) {
+        for (Map.Entry<Relation, List<Double>> entry : this.map.entrySet()) {
             // Populating the result HashMap with the relation and its minimum value
             result.put(entry.getKey(), Collections.min(entry.getValue()));
         }
@@ -63,9 +63,9 @@ public class RelationToValuesMap {
      * @return Object of type RelationToAggregatedValueMap that holds the relations and their aggregated values i.a.
      */
     public RelationToAggregatedValueMap aggregateMax() {
-        HashMap<List<String>, Double> result = new HashMap<>();
+        HashMap<Relation, Double> result = new HashMap<>();
         // Iterating through entries of this.map
-        for (Map.Entry<List<String>, List<Double>> entry : this.map.entrySet()) {
+        for (Map.Entry<Relation, List<Double>> entry : this.map.entrySet()) {
             // Populating the result HashMap with the relation and its maximum value
             result.put(entry.getKey(), Collections.max(entry.getValue()));
         }
@@ -76,9 +76,9 @@ public class RelationToValuesMap {
     }
 
     public RelationToAggregatedValueMap aggregateAvg() {
-        HashMap<List<String>, Double> result = new HashMap<>();
+        HashMap<Relation, Double> result = new HashMap<>();
         // Iterating through entries of this.map
-        for (Map.Entry<List<String>, List<Double>> entry : this.map.entrySet()) {
+        for (Map.Entry<Relation, List<Double>> entry : this.map.entrySet()) {
             // Populating the result HashMap with the relation and its average value
             result.put(entry.getKey(), entry.getValue().stream().mapToDouble(a -> a).average().orElse(Double.NaN));
         }

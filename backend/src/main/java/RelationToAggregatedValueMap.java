@@ -10,12 +10,12 @@ import java.util.stream.Collectors;
  * Holds the aggregated form of the RelationToValuesMap.
  */
 public class RelationToAggregatedValueMap {
-    HashMap<List<String>, Double> map;
+    HashMap<Relation, Double> map;
     String attrKey;
     String operator;
     String aggregationFunction;
 
-    public RelationToAggregatedValueMap(HashMap<List<String>, Double> map, String attrKey,
+    public RelationToAggregatedValueMap(HashMap<Relation, Double> map, String attrKey,
                                         String operator, String aggregationFunction) {
         this.map = map;
         this.attrKey = attrKey;
@@ -32,7 +32,7 @@ public class RelationToAggregatedValueMap {
      */
     public JSONObject toJSON() {
         // Making the nodes JSONArray
-        List<String> nodesList = this.map.keySet().stream().flatMap(l -> l.stream()).distinct().collect(Collectors.toList());
+        List<String> nodesList = this.map.keySet().stream().flatMap(l -> l.eventNames.stream()).distinct().collect(Collectors.toList());
         JSONArray nodes = new JSONArray();
         for(String n : nodesList){
             JSONObject nodeObj = new JSONObject();
@@ -41,10 +41,10 @@ public class RelationToAggregatedValueMap {
         }
         // Making the links JSONArray
         JSONArray links = new JSONArray();
-        for (Map.Entry<List<String>, Double> entry : this.map.entrySet()) {
+        for (Map.Entry<Relation, Double> entry : this.map.entrySet()) {
             JSONObject linkObj = new JSONObject();
-            linkObj.put("source", entry.getKey().get(0));
-            linkObj.put("target", entry.getKey().get(1));
+            linkObj.put("source", entry.getKey().eventNames.get(0));
+            linkObj.put("target", entry.getKey().eventNames.get(1));
             linkObj.put("value", entry.getValue());
             links.put(linkObj);
         }
