@@ -190,6 +190,7 @@ public class LogPreprocessor {
                     relation.eventNames.add(targetAttribute.toString() + "_" + (i + 1));
                 }
 
+
                 // Computing the value
                 double value = Double.NaN;
                 if (operator.equals("SUM")) {
@@ -210,6 +211,28 @@ public class LogPreprocessor {
                     values.add(value);
                     relationToValuesMap.map.put(relation, values);
                 }
+
+                // If its the last relation in the trace, create an extra relation from the last event to the End event
+/*                if(i == trace.size() - 2){
+                    Relation endRelation = new Relation();
+                    endRelation.events.add(targetEvent);
+                    endRelation.events.add(null);
+                    endRelation.eventNames.add(relation.eventNames.get(1));
+                    endRelation.eventNames.add("End");
+
+                    if (relationToValuesMap.map.containsKey(endRelation)) {
+                        List<Double> values = relationToValuesMap.map.get(endRelation);
+                        values.add(1.0);
+                        relationToValuesMap.map.put(endRelation, values);
+                    } else {
+                        List<Double> values = new ArrayList<>();
+                        values.add(1.0);
+                        relationToValuesMap.map.put(endRelation, values);
+                    }
+
+                }*/
+
+
             }
 
             return relationToValuesMap;
