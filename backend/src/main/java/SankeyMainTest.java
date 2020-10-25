@@ -22,7 +22,7 @@ public class SankeyMainTest {
         preprocessor.groups = preprocessor.findTraceGroups(callCenterLog);
         for(XTrace trace : callCenterLog){
             relationToValuesMap = preprocessor.relationToValues(trace, "Activity", "COUNT",
-                    false, relationToValuesMap);
+                    true, relationToValuesMap);
         }
 
         // Aggregating

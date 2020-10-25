@@ -3,10 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
     <title>Document</title>
 </head>
 <body>
     <h1>Sankey Test</h1>
+    <div id="view-options">
+        <select name="alignment" id="alignment">
+            <option value="Left">Left aligned</option>
+            <option value="Right">Right aligned</option>
+            <option value="Center">Centered</option>
+            <option value="Justify">Justified</option>
+        </select>
+
+        <select name="color" id="color">
+            <option value="input">Color by input</option>
+            <option value="output">Color by output</option>
+        </select>
+
+    </div>
     <div id="sankey-container"></div>
 
 
