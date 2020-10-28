@@ -20,8 +20,6 @@ const updateRects = (nodeGroup, generatedData) => {
     nodeGroup.selectAll("rect")
         .data(generatedData.nodes)
         .join("rect")
-        .transition()
-        .duration(700)
         .attr("x", d => d.x0)
         .attr("y", d => d.y0)
         .attr("height", d => d.y1 - d.y0)
@@ -90,8 +88,6 @@ const updateLinksGroup = (linksGroup, generatedData) => {
     // Removing old paths and adding new ones
     links.selectAll("path").remove();
     links.append("path")
-    .transition()
-    .duration(700)
         .attr("d", d3.sankeyLinkHorizontal())
         .attr("stroke", d => {
             const option = document.querySelector("#color").value;
@@ -116,11 +112,11 @@ const updateLinksGroup = (linksGroup, generatedData) => {
 
 
 
-// -------------------- Funtions --------------------
+// -------------------- Script --------------------
 
 // Defining the width and height of the viewBox
 const WIDTH = 900;
-const HEIGHT = 400
+const HEIGHT = 400;
 
 // Creating an SVG element in the HTML
 const svg = d3.select("#sankey-container")
@@ -141,8 +137,22 @@ const sankeyGenerator = d3.sankey()
 // Creating a color scale with the range shcemeCategory10
 const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
+const fileDropDown = document.querySelector("#file");
+let f = fileDropDown.value + ".json";
+console.log(f);
+
+
+fileDropDown.addEventListener("change", (e) => {
+    const value = fileDropDown.value;
+    const name = value + ".json";
+    console.log(name);
+    svg.html("");
+    draw(name);
+});
+
 // Creating the Sankey
-fetch("data.json").then(response => response.json()).then(json => {
+const draw = (fileName)=> {
+fetch(fileName).then(response => response.json()).then(json => {
     const generatedData = sankeyGenerator(json);
     const nodeGroup = createNodeGroup();
     const updatedNodes = updateRects(nodeGroup, generatedData);
@@ -181,3 +191,6 @@ fetch("data.json").then(response => response.json()).then(json => {
 
 });
 
+};
+
+draw(f);

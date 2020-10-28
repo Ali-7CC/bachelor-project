@@ -133,23 +133,35 @@ public class LogPreprocessor {
      * @param relationToValuesMap The HashMap that gets populated with the above described entries.
      * @return A RelationToValuesMap HashMap with the new entries extracted from the trace.
      */
-    public RelationToValuesMap relationToValues(XTrace trace, String attrKey, String operator, boolean grouping,
+    public RelationToValuesMap relationToValues(XTrace trace, String attrKey, String operator, boolean duplicates, boolean grouping,
                                                 RelationToValuesMap relationToValuesMap) {
         // If trace has 1 event only
         if (trace.size() <= 1) {
             if (!operator.equals("COUNT")) return relationToValuesMap;
             // Creating the link
-            XEvent event = trace.get(0);
-            XAttribute eventAttr = event.getAttributes().get(attrKey);
+            XEvent sourceEvent = trace.get(0);
+            XAttribute sourceAttribute = sourceEvent.getAttributes().get(attrKey);
             Relation relation = new Relation();
-            relation.events.add(event);
+            relation.events.add(sourceEvent);
             relation.events.add(null);
-            if(grouping){
-                String groupName = this.groups.makeGroupName(trace, 0);
-                relation.eventNames.add(eventAttr.toString() + "_0_" + "(" + groupName + ")");
-            } else{
-                relation.eventNames.add(eventAttr.toString() + "_0");
+
+            // Naming the source node based on the given configuration
+            String sourceAttributeName = sourceAttribute.toString();
+            String sourceGroupName = this.groups.makeGroupName(trace, 0);
+            if(grouping && duplicates){
+                relation.eventNames.add(sourceAttributeName + "_0_" + "(" + sourceGroupName + ")");
+            } else if (!grouping && duplicates){
+                relation.eventNames.add(sourceAttributeName + "_0");
+            } else if(grouping && !duplicates){
+                relation.eventNames.add(sourceAttributeName + "_" + "(" + sourceGroupName + ")");
+
+            } else {
+                relation.eventNames.add(sourceAttribute.toString());
+
             }
+
+
+
             relation.eventNames.add("End");
             // The value (1.0 is the only valid value)
             double value = 1.0;
@@ -180,14 +192,25 @@ public class LogPreprocessor {
                 Relation relation = new Relation();
                 relation.events.add(sourceEvent);
                 relation.events.add(targetEvent);
-                if(grouping){
-                    String sourceGroupName = this.groups.makeGroupName(trace, i);
-                    String targetGroupName = this.groups.makeGroupName(trace, i + 1);
-                    relation.eventNames.add(sourceAttribute.toString() + "_" + (i) + "_" + "(" + sourceGroupName + ")");
-                    relation.eventNames.add(targetAttribute.toString() + "_" + (i + 1) + "_" + "(" + targetGroupName + ")");
-                } else{
+
+                // Naming the nodes based on the given configuration
+                String sourceAttributeName = sourceAttribute.toString();
+                String targetAttributeName = targetAttribute.toString();
+                String sourceGroupName = this.groups.makeGroupName(trace, i);
+                String targetGroupName = this.groups.makeGroupName(trace, i + 1);
+                if(grouping && duplicates){
+                    relation.eventNames.add(sourceAttributeName + "_" + (i) + "_" + "(" + sourceGroupName + ")");
+                    relation.eventNames.add(targetAttributeName + "_" + (i + 1) + "_" + "(" + targetGroupName + ")");
+                } else if (!grouping && duplicates){
                     relation.eventNames.add(sourceAttribute.toString() + "_" + (i));
                     relation.eventNames.add(targetAttribute.toString() + "_" + (i + 1));
+                } else if(grouping && !duplicates){
+                    relation.eventNames.add(sourceAttributeName + "_" + "(" + sourceGroupName + ")");
+                    relation.eventNames.add(targetAttributeName + "_" + "(" + targetGroupName + ")");
+
+                } else{
+                    relation.eventNames.add(sourceAttributeName);
+                    relation.eventNames.add(targetAttributeName);
                 }
 
 

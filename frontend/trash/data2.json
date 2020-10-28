@@ -1,0 +1,119 @@
+{
+    "nodes": [
+        {
+            "name": "Handle Case"
+        },
+        {
+            "name": "Email Outbound"
+        },
+        {
+            "name": "Call Outbound"
+        },
+        {
+            "name": "Inbound Call"
+        },
+        {
+            "name": "Inbound Email"
+        },
+        {
+            "name": "Handle Email"
+        }
+    ],
+    "links": [
+        {
+            "source": "Handle Case",
+            "value": 1,
+            "target": "Email Outbound"
+        },
+        {
+            "source": "Call Outbound",
+            "value": 1,
+            "target": "Handle Case"
+        },
+        {
+            "source": "Inbound Call",
+            "value": 6,
+            "target": "Handle Case"
+        },
+        {
+            "source": "Inbound Email",
+            "value": 1,
+            "target": "Call Outbound"
+        },
+        {
+            "source": "Handle Email",
+            "value": 2,
+            "target": "Call Outbound"
+        },
+        {
+            "source": "Inbound Call",
+            "value": 3,
+            "target": "Call Outbound"
+        },
+        {
+            "source": "Inbound Email",
+            "value": 2,
+            "target": "Handle Case"
+        },
+        {
+            "source": "Handle Email",
+            "value": 1,
+            "target": "Handle Case"
+        },
+        {
+            "source": "Email Outbound",
+            "value": 1,
+            "target": "Handle Email"
+        },
+        {
+            "source": "Inbound Email",
+            "value": 2,
+            "target": "Email Outbound"
+        },
+        {
+            "source": "Call Outbound",
+            "value": 2,
+            "target": "Call Outbound"
+        },
+        {
+            "source": "Handle Case",
+            "value": 5,
+            "target": "Handle Case"
+        },
+        {
+            "source": "Handle Case",
+            "value": 4,
+            "target": "Inbound Call"
+        },
+        {
+            "source": "Inbound Call",
+            "value": 10,
+            "target": "Inbound Call"
+        },
+        {
+            "source": "Handle Case",
+            "value": 3,
+            "target": "Call Outbound"
+        },
+        {
+            "source": "Call Outbound",
+            "value": 1,
+            "target": "Handle Email"
+        },
+        {
+            "source": "Handle Email",
+            "value": 1,
+            "target": "Handle Email"
+        },
+        {
+            "source": "Inbound Email",
+            "value": 1,
+            "target": "Inbound Email"
+        },
+        {
+            "source": "Email Outbound",
+            "value": 1,
+            "target": "Email Outbound"
+        }
+    ]
+}
