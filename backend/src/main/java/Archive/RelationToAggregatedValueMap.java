@@ -1,3 +1,4 @@
+/*
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -6,9 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+*/
 /**
  * Holds the aggregated form of the RelationToValuesMap.
- */
+ *//*
+
 public class RelationToAggregatedValueMap {
     HashMap<Relation, Double> map;
     String attrKey;
@@ -23,13 +26,15 @@ public class RelationToAggregatedValueMap {
         this.aggregationFunction = aggregationFunction;
     }
 
-    /**
+    */
+/**
      * Constructs a JSON of the HashMap in the form {"links" :
      * {"source" : "source attr", "target" : "target attr", "value" : the aggregated value},...
      * }
      *
      * @return The JSONObject with the key "links" and a JSONArray as a value which contains what's described above.
-     */
+     *//*
+
     public JSONObject toJSON() {
         // Making the nodes JSONArray
         List<String> nodesList = this.map.keySet().stream().flatMap(l -> l.eventNames.stream()).distinct().collect(Collectors.toList());
@@ -55,3 +60,4 @@ public class RelationToAggregatedValueMap {
     }
 
 }
+*/

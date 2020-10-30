@@ -8,7 +8,7 @@ fetch("test.json").then(response => response.json()).then(json => {
 
   // Data
   const matrix = json[0].matrix;
-  const names = json[1].groups;
+  const names = json[1].nodes;
 
 
   // color

@@ -1,3 +1,5 @@
+package Archive;
+
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XTrace;
 
@@ -9,7 +11,7 @@ import java.util.Map;
  * A class that holds the activity variants for a given log
  */
 public class ActivityVariantMap {
-    // Variant ID -> ActivityVariant
+    // Variant ID -> Archive.ActivityVariant
     HashMap<String, ActivityVariant> variants;
 
     public ActivityVariantMap(){
@@ -17,7 +19,7 @@ public class ActivityVariantMap {
     }
 
     /**
-     * Updates the ActivityVariantMap with a given trace.
+     * Updates the Archive.ActivityVariantMap with a given trace.
      * If the activity sequence of the given trace matches one of the variants in the map,
      * the trace is added to that variant. If not, a new variant is created and the trace is
      * added to it.
