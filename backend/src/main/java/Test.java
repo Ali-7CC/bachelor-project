@@ -19,16 +19,16 @@ public class Test {
         List<XLog> logs = parser.parse(file);
         XLog callCenterLog = logs.get(0);
 
-        // Sankey
+        // SankeyModel
         SankeyGenerator sankeyGenerator = new SankeyGenerator(callCenterLog, processor);
-        Sankey activityCountSankey = sankeyGenerator.createSankey("Activity", "COUNT",
+        SankeyModel activityCountSankeyModel = sankeyGenerator.createSankey("Activity", "COUNT",
                 "SUM", true);
-        System.out.println(activityCountSankey.toJSON());
+        System.out.println(activityCountSankeyModel.toJSON());
 
 
-        // Chord
+        // ChordModel
 /*        ChordGenerator chordGenerator = new ChordGenerator(callCenterLog, processor);
-        Chord activityCountChord = chordGenerator.createChord("Activity", "COUNT", "SUM");
+        ChordModel activityCountChord = chordGenerator.createChord("Activity", "COUNT", "SUM");
         System.out.println(activityCountChord.toJSON());*/
 
 
@@ -41,17 +41,17 @@ public class Test {
         List<XLog> hospitalLogs = parser.parse(hospitalFile);
         XLog hospitalLog = hospitalLogs.get(0);
 
-        // Sankey
+        // SankeyModel
 *//*        SankeyGenerator hospitalSankeyGenerator = new SankeyGenerator(hospitalLog, processor);
-        Sankey orgCountSankey = sankeyGenerator.createSankey("org:group", "COUNT",
+        SankeyModel orgCountSankey = sankeyGenerator.createSankey("org:group", "COUNT",
                 "SUM", true);
 
-        System.out.println(activityCountSankey.toJSON());*//*
+        System.out.println(activityCountSankeyModel.toJSON());*//*
 
 
-        // Chord
+        // ChordModel
         ChordGenerator hospitalChordGenerator = new ChordGenerator(hospitalLog, processor);
-        Chord orgCountChord = hospitalChordGenerator.createChord("org:group", "COUNT", "SUM");
+        ChordModel orgCountChord = hospitalChordGenerator.createChord("org:group", "COUNT", "SUM");
         System.out.println(orgCountChord.toJSON());*/
 
 
@@ -63,17 +63,17 @@ public class Test {
         List<XLog> eyeLogs = parser.parse(eyeFile);
         XLog eyeTrackingLog = eyeLogs.get(0);
 
-        // Sankey
+        // SankeyModel
 /*
         SankeyGenerator sankeyGenerator3 = new SankeyGenerator(eyeTrackingLog, processor);
-        Sankey activityCountSankey3 = sankeyGenerator3.createSankey("Activity", "COUNT",
+        SankeyModel activityCountSankey3 = sankeyGenerator3.createSankey("Activity", "COUNT",
                 "SUM", true);
         System.out.println(activityCountSankey3.toJSON());
 
 
-        // Chord
+        // ChordModel
         ChordGenerator chordGenerator3 = new ChordGenerator(eyeTrackingLog, processor);
-        Chord activityCountChord3 = chordGenerator3.createChord("Activity", "COUNT", "SUM");
+        ChordModel activityCountChord3 = chordGenerator3.createChord("Activity", "COUNT", "SUM");
         System.out.println(activityCountChord3.toJSON());
 */
 

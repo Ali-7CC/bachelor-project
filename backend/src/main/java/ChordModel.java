@@ -3,12 +3,15 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class Chord {
+/**
+ * Holds all the information needed for the frontend to generate a Chord diagram.
+ */
+public class ChordModel {
     private double[][] matrix;
     private List<String> nodes;
 
 
-    public Chord(double[][] matrix, List<String> nodes ){
+    public ChordModel(double[][] matrix, List<String> nodes ){
         this.matrix = matrix;
         this.nodes = nodes;
     }

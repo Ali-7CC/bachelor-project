@@ -1,18 +1,18 @@
-import com.google.common.collect.Lists;
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.deckfour.xes.model.impl.XAttributeMapImpl;
 import org.deckfour.xes.model.impl.XLogImpl;
-import org.deckfour.xes.model.impl.XTraceImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-
+/**
+ * Holds an XLog and a LogProcessor and generates SankeyModel(s).
+ */
 public class SankeyGenerator {
     private XLog log;
     private LogProcessor processor;
@@ -23,7 +23,7 @@ public class SankeyGenerator {
     }
 
 
-    public Sankey createSankey(String attributeKey, String operator, String aggregationFunc, boolean grouping) {
+    public SankeyModel createSankey(String attributeKey, String operator, String aggregationFunc, boolean grouping) {
         RelationToValuesMap relationsToValues = new RelationToValuesMap(attributeKey, operator);
         if (grouping) {
             TraceGroupsMap groups = findTraceGroups(this.log);
@@ -47,7 +47,7 @@ public class SankeyGenerator {
                 .flatMap(l -> l.eventNames.stream()).distinct().collect(Collectors.toList());
 
 
-        return new Sankey(nodesList, links);
+        return new SankeyModel(nodesList, links);
 
 
     }

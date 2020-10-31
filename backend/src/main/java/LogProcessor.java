@@ -4,30 +4,23 @@ import org.deckfour.xes.model.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Holds different methods to process an event log of type XLog
+ */
 public class LogProcessor {
 
-
-
-
     /**
-     * Finds all variants in an event log by looking at the sequence of activities in each trace.
+     * Iterates through a trace and populates the RelationToValuesMap with entries in the form
+     * [attribute 1, attribute 2] --> [double 1, double 2,..] based on the chosen attribute and
+     * the chosen operation to preform on their values.
      *
-     * @param log Event log of type XLog containing one <log> element.
-     * @return An object of type Archive.ActivityVariantMap which holds a map of the variants
+     * @param trace               An event log trace of type XTrace
+     * @param attrKey             The key for the chosen attribute.
+     * @param operator            The operator to apply on attribute' values.
+     * @param duplicates          Specifies whether duplicate event should be uniquely identified.
+     * @param relationToValuesMap The HashMap that gets populated with the above described entries.
+     * @return A RelationToValuesMap HashMap with the new entries extracted from the trace.
      */
-    public ActivityVariantMap findVariants(XLog log) {
-        ActivityVariantMap variants = new ActivityVariantMap();
-        for (XTrace trace : log) {
-            List<XAttribute> sequence = new ArrayList<>();
-            for (XEvent event : trace) {
-                XAttribute activity = event.getAttributes().get("Activity");
-                sequence.add(activity);
-            }
-            variants.update(sequence, trace);
-        }
-
-        return variants;
-    }
 
     public RelationToValuesMap relationToValues(XTrace trace, String attrKey, String operator, boolean duplicates,
                                                 RelationToValuesMap relationToValuesMap) {
@@ -145,18 +138,6 @@ public class LogProcessor {
 
     }
 
-
-    /**
-     * Iterates through a trace and populates the RelationToValuesMap with entries in the form
-     * [attribute 1, attribute 2] --> [double 1, double 2,..] based on the chosen attribute and
-     * the chosen operation to preform on their values.
-     *
-     * @param trace               An event log trace of type XTrace
-     * @param attrKey             The key for the chosen attribute.
-     * @param operator            The operator to apply on attribute' values.
-     * @param relationToValuesMap The HashMap that gets populated with the above described entries.
-     * @return A RelationToValuesMap HashMap with the new entries extracted from the trace.
-     */
 
 }
 

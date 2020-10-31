@@ -4,14 +4,16 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-public class Sankey {
+/**
+ * Holds all the information needed for the frontend to generate a Sankey diagram.
+ */
+public class SankeyModel {
     private List<String> nodes;
     private HashMap<Relation, Double> links;
 
 
-    public Sankey(List<String> nodes, HashMap<Relation, Double> links) {
+    public SankeyModel(List<String> nodes, HashMap<Relation, Double> links) {
         this.nodes = nodes;
         this.links = links;
     }
