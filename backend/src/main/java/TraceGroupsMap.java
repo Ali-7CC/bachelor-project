@@ -21,7 +21,7 @@ public class TraceGroupsMap {
      * If the activity is a part of a group, the returned group name is of the form:
      * G{position}{activities up to position}
      * If an activity does not belong to any group, the function returns the trace name instead.
-     * The returned string is used to label nodes in the Sankey diagram so that activities belonging to the same
+     * The returned string is used to label nodes in the SankeyModel diagram so that activities belonging to the same
      * group get the same node.
      *
      * @param trace    The trace of the activity

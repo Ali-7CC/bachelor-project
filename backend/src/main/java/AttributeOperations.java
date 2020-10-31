@@ -11,7 +11,7 @@ public class AttributeOperations {
     public static double sum(XAttribute attr1, XAttribute attr2) {
         double result = Double.NaN;
 
-        // Int type
+        // int type
         if ((attr1 instanceof XAttributeDiscrete) && attr2 instanceof XAttributeDiscrete) {
             result = ((XAttributeDiscrete) attr1).getValue() + ((XAttributeDiscrete) attr2).getValue();
         }

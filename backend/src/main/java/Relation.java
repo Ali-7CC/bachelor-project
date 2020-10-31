@@ -6,7 +6,7 @@ import java.util.Objects;
 
 /**
  * A relation is a collection of 2 events that are executed one after another.
- * This data structure holds the list of that contains the two events. The event
+ * This data structure holds the list that contains the two events. The event
  * at index 0 is executed first, the event at index 1 is executed afterwards.
  * The class also holds the names of the two events, which can contain different types
  * of labels (e.g. attribute name, variant name, etc.) based on the processing of the logs.
@@ -15,7 +15,7 @@ public class Relation {
     List<XEvent> events;
     List<String> eventNames;
 
-    public Relation(){
+    public Relation() {
         this.events = new ArrayList<>();
         this.eventNames = new ArrayList<>();
     }

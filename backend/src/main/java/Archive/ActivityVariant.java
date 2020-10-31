@@ -1,3 +1,5 @@
+package Archive;
+
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XTrace;
 

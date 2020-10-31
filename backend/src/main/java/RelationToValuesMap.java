@@ -9,7 +9,7 @@ import java.util.*;
  * 2) The operation applied to the values of the chosen attribute, e.g. difference
  */
 public class RelationToValuesMap {
-    // The HashMap made by the LogPreprocessor
+    // The HashMap made by the LogProcessor
     public HashMap<Relation, List<Double>> map;
     // The attribute key and operator that were used to create the HashMap
     String attrKey;
@@ -21,22 +21,44 @@ public class RelationToValuesMap {
         this.map = new HashMap<>();
     }
 
+
+    public HashMap<Relation, Double> aggregate(String function){
+        HashMap<Relation, Double> links = new HashMap<>();
+        switch (function) {
+            case "SUM":
+                links = this.aggregateSum();
+                break;
+            case "MIN":
+                links = this.aggregateMin();
+                break;
+
+            case "MAX":
+                links = this.aggregateMax();
+                break;
+
+            case "AVG":
+                links = this.aggregateAvg();
+                break;
+
+            default:
+                System.out.println("Aggregation function not found");
+        }
+        return links;
+    }
+
     /**
      * Sums the list of values associated with each relation in this.map
      *
      * @return Object of type RelationToAggregatedValueMap that holds the relations and their aggregated values i.a.
      */
-    public RelationToAggregatedValueMap aggregateSum() {
+    public HashMap<Relation, Double> aggregateSum() {
         HashMap<Relation, Double> result = new HashMap<>();
         // Iterating through entries of this.map
         for (Map.Entry<Relation, List<Double>> entry : this.map.entrySet()) {
             // Populating the result HashMap with the relation and its summed values
             result.put(entry.getKey(), entry.getValue().stream().mapToDouble(v -> v).sum());
         }
-        // Putting the result in a RelationToAggregatedValueMap object and returning it
-        RelationToAggregatedValueMap aggregatedValueMap = new RelationToAggregatedValueMap(result, this.attrKey,
-                this.operator, "SUM");
-        return aggregatedValueMap;
+        return result;
     }
 
     /**
@@ -44,17 +66,15 @@ public class RelationToValuesMap {
      *
      * @return Object of type RelationToAggregatedValueMap that holds the relations and their aggregated values i.a.
      */
-    public RelationToAggregatedValueMap aggregateMin() {
+    public HashMap<Relation, Double> aggregateMin() {
         HashMap<Relation, Double> result = new HashMap<>();
         // Iterating through entries of this.map
         for (Map.Entry<Relation, List<Double>> entry : this.map.entrySet()) {
             // Populating the result HashMap with the relation and its minimum value
             result.put(entry.getKey(), Collections.min(entry.getValue()));
         }
-        // Putting the result in a RelationToAggregatedValueMap object and returning it
-        RelationToAggregatedValueMap aggregatedValueMap = new RelationToAggregatedValueMap(result, this.attrKey,
-                this.operator, "MIN");
-        return aggregatedValueMap;
+
+        return result;
     }
 
     /**
@@ -62,30 +82,26 @@ public class RelationToValuesMap {
      *
      * @return Object of type RelationToAggregatedValueMap that holds the relations and their aggregated values i.a.
      */
-    public RelationToAggregatedValueMap aggregateMax() {
+    public HashMap<Relation, Double> aggregateMax() {
         HashMap<Relation, Double> result = new HashMap<>();
         // Iterating through entries of this.map
         for (Map.Entry<Relation, List<Double>> entry : this.map.entrySet()) {
             // Populating the result HashMap with the relation and its maximum value
             result.put(entry.getKey(), Collections.max(entry.getValue()));
         }
-        // Putting the result in a RelationToAggregatedValueMap object and returning it
-        RelationToAggregatedValueMap aggregatedValueMap = new RelationToAggregatedValueMap(result, this.attrKey,
-                this.operator, "MAX");
-        return aggregatedValueMap;
+
+        return result;
     }
 
-    public RelationToAggregatedValueMap aggregateAvg() {
+    public HashMap<Relation, Double> aggregateAvg() {
         HashMap<Relation, Double> result = new HashMap<>();
         // Iterating through entries of this.map
         for (Map.Entry<Relation, List<Double>> entry : this.map.entrySet()) {
             // Populating the result HashMap with the relation and its average value
             result.put(entry.getKey(), entry.getValue().stream().mapToDouble(a -> a).average().orElse(Double.NaN));
         }
-        // Putting the result in a RelationToAggregatedValueMap object and returning it
-        RelationToAggregatedValueMap aggregatedValueMap = new RelationToAggregatedValueMap(result, this.attrKey,
-                this.operator, "AVG");
-        return aggregatedValueMap;
+
+        return result;
 
 
     }
