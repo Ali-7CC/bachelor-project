@@ -1,3 +1,8 @@
+package App.Chord;
+
+import App.Shared.LogProcessor;
+import App.Shared.Relation;
+import App.Shared.RelationToValuesMap;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 
@@ -7,7 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Holds an XLog and a LogProcessor and generates ChordModel(s).
+ * Holds an XLog and a App.Shared.LogProcessor and generates App.Chord.ChordModel(s).
  */
 public class ChordGenerator {
     private XLog log;

@@ -1,10 +1,12 @@
+package App.Chord;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
 
 /**
- * Holds all the information needed for the frontend to generate a Chord diagram.
+ * Holds all the information needed for the frontend to generate a App.Chord diagram.
  */
 public class ChordModel {
     private double[][] matrix;

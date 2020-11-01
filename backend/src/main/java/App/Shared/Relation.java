@@ -1,3 +1,5 @@
+package App.Shared;
+
 import org.deckfour.xes.model.XEvent;
 
 import java.util.ArrayList;
@@ -12,8 +14,8 @@ import java.util.Objects;
  * of labels (e.g. attribute name, variant name, etc.) based on the processing of the logs.
  */
 public class Relation {
-    List<XEvent> events;
-    List<String> eventNames;
+    public List<XEvent> events;
+    public List<String> eventNames;
 
     public Relation() {
         this.events = new ArrayList<>();

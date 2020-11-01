@@ -1,3 +1,9 @@
+package App.Sankey;
+
+import App.Shared.AttributeOperations;
+import App.Shared.LogProcessor;
+import App.Shared.Relation;
+import App.Shared.RelationToValuesMap;
 import org.deckfour.xes.model.XAttribute;
 import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
@@ -11,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 /**
- * Holds an XLog and a LogProcessor and generates SankeyModel(s).
+ * Holds an XLog and a App.Shared.LogProcessor and generates App.Sankey.SankeyModel(s).
  */
 public class SankeyGenerator {
     private XLog log;
@@ -146,7 +152,7 @@ public class SankeyGenerator {
 
                 // If its the last relation in the trace, create an extra relation from the last event to the End event
 /*                if(i == trace.size() - 2){
-                    Relation endRelation = new Relation();
+                    App.Shared.Relation endRelation = new App.Shared.Relation();
                     endRelation.events.add(targetEvent);
                     endRelation.events.add(null);
                     endRelation.eventNames.add(relation.eventNames.get(1));
@@ -176,11 +182,11 @@ public class SankeyGenerator {
 
 
     /**
-     * Finds the TraceGroups for a given event log and returns a TraceGroupsMap with the found trace groups.
+     * Finds the TraceGroups for a given event log and returns a App.Sankey.TraceGroupsMap with the found trace groups.
      *
      * @param log An event log of type XLog or List<XTrace>
      * @return A TraceGroupMap that maps the index to which the traces share their first activities to
-     * the list of TraceGroup
+     * the list of App.Sankey.TraceGroup
      */
     public TraceGroupsMap findTraceGroups(List<XTrace> log) {
         HashMap<Integer, List<TraceGroup>> groupsMap = new HashMap<>();
@@ -220,20 +226,20 @@ public class SankeyGenerator {
 
 
     /**
-     * Divides a given TraceGroup into more refined trace groups.
-     * i.e. if the given TraceGroup shares activities up to index 3,
+     * Divides a given App.Sankey.TraceGroup into more refined trace groups.
+     * i.e. if the given App.Sankey.TraceGroup shares activities up to index 3,
      * The returned list of groups that contain >=2 traces share activities up to index 4.
      *
-     * @param group The TraceGroup to be divided/refined
+     * @param group The App.Sankey.TraceGroup to be divided/refined
      * @param n     The index that the grouping is based on, which equals the current index
-     *              of the given TraceGroup + 1
-     * @return A list of TraceGroup. Each TraceGroup in that list that contains 2 or more traces share
+     *              of the given App.Sankey.TraceGroup + 1
+     * @return A list of App.Sankey.TraceGroup. Each App.Sankey.TraceGroup in that list that contains 2 or more traces share
      * the first n activities.
      */
     public List<TraceGroup> groupBynthActivity(TraceGroup group, int n) {
         // Initializing the list to be returned
         List<TraceGroup> traceGroups = new ArrayList<>();
-        // Traces that are shorter or equal to n are immediately made into a new TraceGroup and added to the
+        // Traces that are shorter or equal to n are immediately made into a new App.Sankey.TraceGroup and added to the
         // list to be returned. Longer traces are kept for the grouping.
         TraceGroup longGroups = new TraceGroup();
         for (XTrace trace : group.traces) {

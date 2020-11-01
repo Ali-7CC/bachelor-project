@@ -1,4 +1,5 @@
-import org.deckfour.xes.model.XEvent;
+package App.Sankey;
+
 import org.deckfour.xes.model.XTrace;
 
 import java.util.ArrayList;
@@ -7,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Contains a map that maps an integer to a list of TraceGroup.
+ * Contains a map that maps an integer to a list of App.Sankey.TraceGroup.
  * The integer represents the index to which the trace groups have the same activities.
  e.g. The entry 3 -> [[T1, T2], [T3, T4, T5]] means that [T1, T2] have the same first 4 activities,
  [T3, T4, T5] also share their first 4 activities, however they don't match with [T1, T2].
@@ -21,7 +22,7 @@ public class TraceGroupsMap {
      * If the activity is a part of a group, the returned group name is of the form:
      * G{position}{activities up to position}
      * If an activity does not belong to any group, the function returns the trace name instead.
-     * The returned string is used to label nodes in the SankeyModel diagram so that activities belonging to the same
+     * The returned string is used to label nodes in the App.Sankey.SankeyModel diagram so that activities belonging to the same
      * group get the same node.
      *
      * @param trace    The trace of the activity

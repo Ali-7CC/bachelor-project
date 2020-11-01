@@ -1,3 +1,5 @@
+package App.Sankey;
+
 import org.deckfour.xes.model.XTrace;
 
 import java.util.ArrayList;

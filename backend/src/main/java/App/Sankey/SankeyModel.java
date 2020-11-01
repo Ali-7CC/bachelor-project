@@ -1,3 +1,6 @@
+package App.Sankey;
+
+import App.Shared.Relation;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -6,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Holds all the information needed for the frontend to generate a Sankey diagram.
+ * Holds all the information needed for the frontend to generate a App.Sankey diagram.
  */
 public class SankeyModel {
     private List<String> nodes;
