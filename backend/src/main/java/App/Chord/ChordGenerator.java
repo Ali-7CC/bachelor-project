@@ -16,18 +16,16 @@ import java.util.stream.Collectors;
  */
 public class ChordGenerator {
     private XLog log;
-    LogProcessor processor;
 
     public ChordGenerator(XLog log, LogProcessor processor) {
         this.log = log;
-        this.processor = processor;
     }
 
 
     public ChordModel createChord(String attributeKey, String operator, String aggregationFunc) {
         RelationToValuesMap relationsToValues = new RelationToValuesMap(attributeKey, operator);
         for (XTrace trace : this.log) {
-            relationsToValues = this.processor.relationToValues(trace, attributeKey, operator,
+            relationsToValues = LogProcessor.relationToValues(trace, attributeKey, operator,
                     false, relationsToValues);
         }
 

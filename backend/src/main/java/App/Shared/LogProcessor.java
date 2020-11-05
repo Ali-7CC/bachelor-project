@@ -10,11 +10,11 @@ import java.util.List;
  */
 public class LogProcessor {
 
-    public static List<String> getValidAttributeKeys(XLog log){
+    public static List<String> getValidAttributeKeys(XLog log) {
         List<String> validAttr = new ArrayList<>();
-        for(XAttribute attr : log.getGlobalEventAttributes()){
-            if((attr instanceof XAttributeLiteral) || (attr instanceof XAttributeDiscrete) || (attr instanceof XAttributeContinuous) ||
-                    (attr instanceof XAttributeTimestamp)){
+        for (XAttribute attr : log.getGlobalEventAttributes()) {
+            if ((attr instanceof XAttributeLiteral) || (attr instanceof XAttributeDiscrete) || (attr instanceof XAttributeContinuous) ||
+                    (attr instanceof XAttributeTimestamp)) {
                 validAttr.add(attr.getKey());
             }
         }
@@ -34,8 +34,8 @@ public class LogProcessor {
      * @return A App.Shared.RelationToValuesMap HashMap with the new entries extracted from the trace.
      */
 
-    public RelationToValuesMap relationToValues(XTrace trace, String attrKey, String operator, boolean duplicates,
-                                                RelationToValuesMap relationToValuesMap) {
+    public static RelationToValuesMap relationToValues(XTrace trace, String attrKey, String operator, boolean duplicates,
+                                                       RelationToValuesMap relationToValuesMap) {
         // If trace has 1 event only
         if (trace.size() <= 1) {
             if (!operator.equals("COUNT")) return relationToValuesMap;

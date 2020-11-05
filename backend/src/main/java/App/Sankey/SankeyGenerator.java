@@ -10,36 +10,32 @@ import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.deckfour.xes.model.impl.XAttributeMapImpl;
 import org.deckfour.xes.model.impl.XLogImpl;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
 /**
  * Holds an XLog and a App.Shared.LogProcessor and generates App.Sankey.SankeyModel(s).
  */
+
+@Service
 public class SankeyGenerator {
-    private XLog log;
-    private LogProcessor processor;
 
-    public SankeyGenerator(XLog log, LogProcessor processor) {
-        this.log = log;
-        this.processor = processor;
-    }
-
-
-    public SankeyModel createSankey(String attributeKey, String operator, String aggregationFunc, boolean grouping) {
+    public SankeyModel createSankey(XLog log, String attributeKey, String operator, String aggregationFunc, boolean grouping) {
         RelationToValuesMap relationsToValues = new RelationToValuesMap(attributeKey, operator);
         if (grouping) {
-            TraceGroupsMap groups = findTraceGroups(this.log);
-            for (XTrace trace : this.log) {
+            TraceGroupsMap groups = findTraceGroups(log);
+            for (XTrace trace : log) {
                 relationsToValues = this.groupedRelationToValues(trace, attributeKey, operator, groups, relationsToValues);
             }
 
         } else {
-            for (XTrace trace : this.log) {
-                relationsToValues = this.processor.relationToValues(trace, attributeKey, operator,
+            for (XTrace trace : log) {
+                relationsToValues = LogProcessor.relationToValues(trace, attributeKey, operator,
                         true, relationsToValues);
             }
         }
@@ -58,14 +54,14 @@ public class SankeyGenerator {
 
     }
 
-    private XLog reverseTraces(XLog log){
+    private XLog reverseTraces(XLog log) {
         XLog reversedLog = new XLogImpl(new XAttributeMapImpl());
-        for(XTrace trace : log){
+        for (XTrace trace : log) {
             Collections.reverse(trace);
             reversedLog.add(trace);
 
         }
-        return  reversedLog;
+        return reversedLog;
     }
 
 

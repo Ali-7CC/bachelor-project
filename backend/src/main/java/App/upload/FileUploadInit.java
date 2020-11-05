@@ -1,13 +1,17 @@
-package App.Storage;
+package App.upload;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FileStorageInit implements CommandLineRunner {
+public class FileUploadInit implements CommandLineRunner {
+    private FileUploadService storageService;
+
     @Autowired
-    private FileStorageService storageService;
+    public FileUploadInit(FileUploadService storageService) {
+        this.storageService = storageService;
+    }
 
     // Runs before spring boot application starts up
     @Override

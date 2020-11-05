@@ -13,14 +13,13 @@ public class ChordModel {
     private List<String> nodes;
 
 
-    public ChordModel(double[][] matrix, List<String> nodes ){
+    public ChordModel(double[][] matrix, List<String> nodes) {
         this.matrix = matrix;
         this.nodes = nodes;
     }
 
 
-
-    public JSONArray toJSON(){
+    public JSONArray toJSON() {
         JSONArray result = new JSONArray();
         JSONObject matrix = new JSONObject();
         JSONObject nodes = new JSONObject();

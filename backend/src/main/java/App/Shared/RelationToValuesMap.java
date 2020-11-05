@@ -1,6 +1,9 @@
 package App.Shared;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -12,7 +15,7 @@ import java.util.*;
  */
 public class RelationToValuesMap {
     // The HashMap made by the App.Shared.LogProcessor
-     public HashMap<Relation, List<Double>> map;
+    public HashMap<Relation, List<Double>> map;
     // The attribute key and operator that were used to create the HashMap
     String attrKey;
     String operator;
@@ -24,7 +27,7 @@ public class RelationToValuesMap {
     }
 
 
-    public HashMap<Relation, Double> aggregate(String function){
+    public HashMap<Relation, Double> aggregate(String function) {
         HashMap<Relation, Double> links = new HashMap<>();
         switch (function) {
             case "SUM":

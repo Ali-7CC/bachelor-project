@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 /**
  * Contains a map that maps an integer to a list of App.Sankey.TraceGroup.
  * The integer represents the index to which the trace groups have the same activities.
- e.g. The entry 3 -> [[T1, T2], [T3, T4, T5]] means that [T1, T2] have the same first 4 activities,
- [T3, T4, T5] also share their first 4 activities, however they don't match with [T1, T2].
+ * e.g. The entry 3 -> [[T1, T2], [T3, T4, T5]] means that [T1, T2] have the same first 4 activities,
+ * [T3, T4, T5] also share their first 4 activities, however they don't match with [T1, T2].
  */
 public class TraceGroupsMap {
     HashMap<Integer, List<TraceGroup>> map;

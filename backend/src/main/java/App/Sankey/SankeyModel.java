@@ -22,7 +22,7 @@ public class SankeyModel {
     }
 
 
-    public JSONObject toJSON() {
+    public String toJSONString() {
         // Making the nodes JSONArray
         JSONArray nodesJSONArray = new JSONArray();
         for (String n : this.nodes) {
@@ -46,7 +46,7 @@ public class SankeyModel {
         JSONObject result = new JSONObject();
         result.put("links", linksJSONArray);
         result.put("nodes", nodesJSONArray);
-        return result;
+        return result.toString();
 
 
     }
