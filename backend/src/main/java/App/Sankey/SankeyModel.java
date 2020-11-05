@@ -1,3 +1,6 @@
+package App.Sankey;
+
+import App.Shared.Relation;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -6,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Holds all the information needed for the frontend to generate a Sankey diagram.
+ * Holds all the information needed for the frontend to generate a App.Sankey diagram.
  */
 public class SankeyModel {
     private List<String> nodes;
@@ -19,7 +22,7 @@ public class SankeyModel {
     }
 
 
-    public JSONObject toJSON() {
+    public String toJSONString() {
         // Making the nodes JSONArray
         JSONArray nodesJSONArray = new JSONArray();
         for (String n : this.nodes) {
@@ -43,7 +46,7 @@ public class SankeyModel {
         JSONObject result = new JSONObject();
         result.put("links", linksJSONArray);
         result.put("nodes", nodesJSONArray);
-        return result;
+        return result.toString();
 
 
     }

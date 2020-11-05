@@ -1,4 +1,5 @@
-import Archive.ActivityVariantMap;
+package App.Shared;
+
 import org.deckfour.xes.model.*;
 
 import java.util.ArrayList;
@@ -9,8 +10,19 @@ import java.util.List;
  */
 public class LogProcessor {
 
+    public static List<String> getValidAttributeKeys(XLog log) {
+        List<String> validAttr = new ArrayList<>();
+        for (XAttribute attr : log.getGlobalEventAttributes()) {
+            if ((attr instanceof XAttributeLiteral) || (attr instanceof XAttributeDiscrete) || (attr instanceof XAttributeContinuous) ||
+                    (attr instanceof XAttributeTimestamp)) {
+                validAttr.add(attr.getKey());
+            }
+        }
+        return validAttr;
+    }
+
     /**
-     * Iterates through a trace and populates the RelationToValuesMap with entries in the form
+     * Iterates through a trace and populates the App.Shared.RelationToValuesMap with entries in the form
      * [attribute 1, attribute 2] --> [double 1, double 2,..] based on the chosen attribute and
      * the chosen operation to preform on their values.
      *
@@ -19,11 +31,11 @@ public class LogProcessor {
      * @param operator            The operator to apply on attribute' values.
      * @param duplicates          Specifies whether duplicate event should be uniquely identified.
      * @param relationToValuesMap The HashMap that gets populated with the above described entries.
-     * @return A RelationToValuesMap HashMap with the new entries extracted from the trace.
+     * @return A App.Shared.RelationToValuesMap HashMap with the new entries extracted from the trace.
      */
 
-    public RelationToValuesMap relationToValues(XTrace trace, String attrKey, String operator, boolean duplicates,
-                                                RelationToValuesMap relationToValuesMap) {
+    public static RelationToValuesMap relationToValues(XTrace trace, String attrKey, String operator, boolean duplicates,
+                                                       RelationToValuesMap relationToValuesMap) {
         // If trace has 1 event only
         if (trace.size() <= 1) {
             if (!operator.equals("COUNT")) return relationToValuesMap;
@@ -110,7 +122,7 @@ public class LogProcessor {
 
                 // If its the last relation in the trace, create an extra relation from the last event to the End event
 /*                if(i == trace.size() - 2){
-                    Relation endRelation = new Relation();
+                    App.Shared.Relation endRelation = new App.Shared.Relation();
                     endRelation.events.add(targetEvent);
                     endRelation.events.add(null);
                     endRelation.eventNames.add(relation.eventNames.get(1));

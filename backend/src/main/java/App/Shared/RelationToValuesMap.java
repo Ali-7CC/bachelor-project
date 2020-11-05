@@ -1,15 +1,20 @@
-import java.util.*;
+package App.Shared;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
  * Class that represents the set of mappings that have the following form:
- * Relation --> [Double 1, Double 2, ..]
+ * App.Shared.Relation --> [Double 1, Double 2, ..]
  * The semantic of the double depends two factors:
  * 1) The chosen event attribute, e.g. Activity, time:timestamp, etc.
  * 2) The operation applied to the values of the chosen attribute, e.g. difference
  */
 public class RelationToValuesMap {
-    // The HashMap made by the LogProcessor
+    // The HashMap made by the App.Shared.LogProcessor
     public HashMap<Relation, List<Double>> map;
     // The attribute key and operator that were used to create the HashMap
     String attrKey;
@@ -22,7 +27,7 @@ public class RelationToValuesMap {
     }
 
 
-    public HashMap<Relation, Double> aggregate(String function){
+    public HashMap<Relation, Double> aggregate(String function) {
         HashMap<Relation, Double> links = new HashMap<>();
         switch (function) {
             case "SUM":

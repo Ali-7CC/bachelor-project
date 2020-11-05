@@ -1,3 +1,5 @@
+package App.Sankey;
+
 import org.deckfour.xes.model.XTrace;
 
 import java.util.ArrayList;
@@ -11,7 +13,7 @@ public class TraceGroup {
     List<XTrace> traces;
     int index;
 
-    public TraceGroup(){
+    public TraceGroup() {
         this.traces = new ArrayList<>();
         this.index = -1;
     }
