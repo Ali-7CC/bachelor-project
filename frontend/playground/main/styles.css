@@ -1,0 +1,30 @@
+#process {
+    margin-top: 7px;
+    margin-bottom: 7px;
+    border-color: black;
+}
+
+#process select{
+   margin-right: 5px;
+
+}
+#upload button{
+   margin-left: 113px;
+}
+
+
+#process button{
+   margin-left: 40px;
+}
+
+#process view-options{
+   margin-right: 5px;
+
+}
+
+#diagram{
+    width: 1000x;
+    height: 550px;
+    border: solid;
+    margin-top: 10px;
+}
