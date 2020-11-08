@@ -160,6 +160,7 @@ fetch(fileName).then(response => response.json()).then(json => {
     const updatedNames = updateNames(namesGroup, generatedData);
     const linksGroup = createLinksGroup();
     const updatedLinks = updateLinksGroup(linksGroup, generatedData);
+    console.log(generatedData);
 
 
     // Color dropdown
