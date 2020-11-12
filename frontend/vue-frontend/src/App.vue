@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <sankey></sankey>
+    <Data></Data>
   </div>
 </template>
 
 <script>
-import Sankey from './components/Sankey.vue'
+import Data from './components/Data.vue'
 
 export default {
   name: 'App',
   components: {
-    Sankey
+    Data
   }
 }
 </script>
