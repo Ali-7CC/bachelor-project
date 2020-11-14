@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Sankey</title>
+</head>
+<body>
+    <h1>Process Data Visualization</h1>
+    <div id="data-processing">
+        <div id="upload">
+            <input type="file" name="file" id="file-upload">
+            <button id="upload-button">Upload</button>
+        </div>
+    
+        <div id="process">
+            <select name="" id="">
+                <option value="">File 1</option>
+                <option value="">File 2</option>
+                <option value="">File 3</option>
+            </select>
+    
+            <select name="" id="">
+                <option value="">Attribute 1</option>
+                <option value="">Attribute 2</option>
+                <option value="">Attribute 3</option>
+            </select>
+    
+            <select name="" id="">
+                <option value="">Sum</option>
+                <option value="">Difference</option>
+                <option value="">Count</option>
+            </select>
+    
+            <select name="" id="">
+                <option value="">Max</option>
+                <option value="">Min</option>
+                <option value="">Average</option>
+            </select>
+            <button>Process</button>
+
+            
+        </div>
+        <div id="tab">
+            <button class="tablinks active">Sankey</button>
+            <button class="tablinks">Chord</button>
+        </div>ssss
+
+    </div>
+
+
+    <div id="diagram">
+
+        <h2>Sankey Diagram</h2>
+        <div id="view-options">
+            <select name="alignment" id="alignment">
+                <option value="Left">Left aligned</option>
+                <option value="Right">Right aligned</option>
+                <option value="Center">Centered</option>
+                <option value="Justify">Justified</option>
+            </select>
+    
+            <select name="color" id="color">
+                <option value="input">Color by input</option>
+                <option value="output">Color by output</option>
+            </select>
+    
+            <select name="file" id="file">
+                <option value="call_center_not_grouped">No groups</option>
+                <option value="call_center_grouped">Grouped traces</option>
+                <option value="call_center_grouped_shared_end">Grouped traces with shared End</option>
+                <option value="dump">Dump</option>
+    
+            </select>
+        </div>
+        <div id="viewer">
+    
+        </div>
+        
+
+    </div>
+
+</body>
+</html>
