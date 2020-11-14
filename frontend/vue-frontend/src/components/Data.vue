@@ -6,8 +6,35 @@
       <button v-on:click="onUpload">Upload</button>
     </div>
     <div id="draw-container">
-      <select>
-        <!-- v-for option from file -->
+      <select v-model="selectedFileDraw">
+        <option value=null>Select a file</option>
+        <option v-for="file in this.files" v-bind:key="file.name">
+          {{ file.name }}
+        </option>
+      </select>
+      <select v-model="selectedAttr">
+        <option value="">Select an attribute</option>
+        <template v-if="selectedFileDraw !=null">
+          <option
+            v-for="attr in files.find((f) => f.name === selectedFileDraw)
+              .attributes"
+            v-bind:key="attr"
+          >
+            {{ attr }}
+          </option>
+        </template>
+      </select>
+      <select v-model="selectedOp">
+        <option value="">Select an operation</option>
+        <option value="COUNT">Count</option>
+        <option value="SUM">Sum</option>
+        <option value="DIFF">Difference</option>
+      </select>
+      <select v-model="selectedAgg">
+        <option value="">Select an aggregator</option>
+        <option value="MAX">Max</option>
+        <option value="MIN">Min</option>
+        <option value="AVG">Average</option>
       </select>
     </div>
   </div>
@@ -19,8 +46,14 @@ import axios from "axios";
 export default {
   data() {
     return {
-      selectedFileUpload: null,
-      files : {}
+      // File upload
+      selectedFileUpload: "",
+      files: [],
+      // Drawing
+      selectedFileDraw: null,
+      selectedAttr: "",
+      selectedOp: "",
+      selectedAgg: "",
     };
   },
 
@@ -32,12 +65,15 @@ export default {
     onUpload: function () {
       const payload = new FormData();
       payload.append("file", this.selectedFileUpload);
-      axios
-        .post("http://localhost:8080/upload", payload)
-        .then((res) => {
-            this.files[this.selectedFileUpload.name] = res.data;
-            this.selectedFileUpload = null;
-        });
+      axios.post("http://localhost:8080/upload", payload).then((res) => {
+        const newFile = {
+          name: this.selectedFileUpload.name,
+          attributes: res.data.validAttributes,
+        };
+        this.files.push(newFile);
+        console.log(newFile);
+        this.selectedFileUpload = null;
+      });
     },
   },
 };
