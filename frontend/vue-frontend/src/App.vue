@@ -1,18 +1,21 @@
 <template>
   <div id="app">
-    <Data></Data>
+    <Data> </Data>
+    <Sankey></Sankey> 
   </div>
 </template>
 
 <script>
-import Data from './components/Data.vue'
+import Data from "./components/Data.vue";
+import Sankey from "./components/Sankey.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    Data
-  }
-}
+    Data,
+    Sankey,
+  },
+};
 </script>
 
 <style>

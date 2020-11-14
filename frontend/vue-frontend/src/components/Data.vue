@@ -36,6 +36,7 @@
         <option value="MIN">Min</option>
         <option value="AVG">Average</option>
       </select>
+      <button v-on:click="onDraw">Draw</button>
     </div>
   </div>
 </template>
@@ -46,6 +47,8 @@ import axios from "axios";
 export default {
   data() {
     return {
+      // Children
+      visualizations : [],
       // File upload
       selectedFileUpload: "",
       files: [],
@@ -55,6 +58,10 @@ export default {
       selectedOp: "",
       selectedAgg: "",
     };
+  },
+
+  created(){
+    this.visualizations = this.$children;
   },
 
   methods: {
@@ -75,6 +82,20 @@ export default {
         this.selectedFileUpload = null;
       });
     },
+
+    onDraw : () => {
+      const payload = new FormData();
+      payload.append("fileName", this.selectedFileDraw);
+      payload.append("attributeKey", this.selectedAttr);
+      payload.append("operation", this.selectedOp);
+      payload.append("aggregationFunc", this.selectedAgg);
+
+      // axios.post("http://localhost:8080/sankey",payload.then(res => {
+
+
+      // }))
+
+    }
   },
 };
 </script>
