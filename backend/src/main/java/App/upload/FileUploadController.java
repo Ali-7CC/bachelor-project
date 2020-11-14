@@ -5,6 +5,7 @@ import org.deckfour.xes.model.XLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +26,7 @@ public class FileUploadController {
     public FileUploadController(FileUploadService storageService) {
         this.storageService = storageService;
     }
-
+    @CrossOrigin(origins = "http://localhost:8081")
     @PostMapping("/upload")
     public ResponseEntity<HashMap<String, List<String>>> fileUpload(@RequestParam("file") MultipartFile file) {
         try {

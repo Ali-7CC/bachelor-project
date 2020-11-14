@@ -1,28 +1,47 @@
 <template>
-<div>
+  <div>
     <h1>Process Data Visualization</h1>
     <div id="upload-container">
-            <input type="file" name="file" id="file-upload">
-            <button id="upload-button">Upload</button>
+      <input type="file" accept=".xes" v-on:change="onFileSelected" />
+      <button v-on:click="onUpload">Upload</button>
     </div>
     <div id="draw-container">
-        <select name="file-name" id="file-name"></select>
-        <select name="attribute" id="attribute"></select>
-        <select name="operator" id="operator"></select>
-        <select name="aggregator" id="aggregator"></select>
-        <button>Draw</button>
+      <select>
+        <!-- v-for option from file -->
+      </select>
     </div>
-</div>
-
-  
+  </div>
 </template>
 
 <script>
-export default {
+import axios from "axios";
 
-}
+export default {
+  data() {
+    return {
+      selectedFileUpload: null,
+      files : {}
+    };
+  },
+
+  methods: {
+    onFileSelected: function (event) {
+      this.selectedFileUpload = event.target.files[0];
+    },
+
+    onUpload: function () {
+      const payload = new FormData();
+      payload.append("file", this.selectedFileUpload);
+      axios
+        .post("http://localhost:8080/upload", payload)
+        .then((res) => {
+            this.files[this.selectedFileUpload.name] = res.data;
+            this.selectedFileUpload = null;
+        });
+    },
+  },
+};
 </script>
 
 <style scoped>
-
 </style>>
