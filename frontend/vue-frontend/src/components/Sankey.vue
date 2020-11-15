@@ -28,6 +28,7 @@ import * as d3 from "d3";
 import * as d3Sankey from "d3-sankey";
 
 export default {
+  props : ["sankeyData"],
   data() {
     return {
       colorScale: {},
@@ -37,557 +38,31 @@ export default {
       alignment: "sankeyLeft",
       color: "input",
       isGrouped: "false",
-      ungroupedData: {
-        nodes: [
-          {
-            name: "Call Outbound_1",
-          },
-          {
-            name: "Handle Email_2",
-          },
-          {
-            name: "Handle Case_2",
-          },
-          {
-            name: "Call Outbound_3",
-          },
-          {
-            name: "Handle Case_4",
-          },
-          {
-            name: "Call Outbound_5",
-          },
-          {
-            name: "Handle Email_0",
-          },
-          {
-            name: "Inbound Email_1",
-          },
-          {
-            name: "Handle Email_1",
-          },
-          {
-            name: "Inbound Call_0",
-          },
-          {
-            name: "Handle Case_1",
-          },
-          {
-            name: "Inbound Call_1",
-          },
-          {
-            name: "Call Outbound_2",
-          },
-          {
-            name: "Inbound Call_2",
-          },
-          {
-            name: "Inbound Call_3",
-          },
-          {
-            name: "Inbound Email_0",
-          },
-          {
-            name: "Email Outbound_1",
-          },
-          {
-            name: "Handle Case_3",
-          },
-          {
-            name: "Handle Case_0",
-          },
-          {
-            name: "Email Outbound_2",
-          },
-          {
-            name: "Inbound Call_4",
-          },
-          {
-            name: "Call Outbound_4",
-          },
-        ],
-        links: [
-          {
-            source: "Call Outbound_1",
-            value: 1,
-            target: "Handle Email_2",
-          },
-          {
-            source: "Handle Case_2",
-            value: 1,
-            target: "Call Outbound_3",
-          },
-          {
-            source: "Handle Case_4",
-            value: 1,
-            target: "Call Outbound_5",
-          },
-          {
-            source: "Inbound Email_1",
-            value: 1,
-            target: "Handle Case_2",
-          },
-          {
-            source: "Handle Email_1",
-            value: 1,
-            target: "Handle Case_2",
-          },
-          {
-            source: "Inbound Call_0",
-            value: 5,
-            target: "Handle Case_1",
-          },
-          {
-            source: "Inbound Call_1",
-            value: 1,
-            target: "Call Outbound_2",
-          },
-          {
-            source: "Handle Email_0",
-            value: 2,
-            target: "Call Outbound_1",
-          },
-          {
-            source: "Handle Email_0",
-            value: 1,
-            target: "Handle Email_1",
-          },
-          {
-            source: "Inbound Call_0",
-            value: 6,
-            target: "Inbound Call_1",
-          },
-          {
-            source: "Inbound Call_2",
-            value: 1,
-            target: "Inbound Call_3",
-          },
-          {
-            source: "Inbound Email_0",
-            value: 2,
-            target: "Email Outbound_1",
-          },
-          {
-            source: "Handle Case_2",
-            value: 1,
-            target: "Inbound Call_3",
-          },
-          {
-            source: "Handle Case_2",
-            value: 2,
-            target: "Handle Case_3",
-          },
-          {
-            source: "Handle Case_0",
-            value: 1,
-            target: "Handle Case_1",
-          },
-          {
-            source: "Call Outbound_2",
-            value: 1,
-            target: "Call Outbound_3",
-          },
-          {
-            source: "Email Outbound_1",
-            value: 1,
-            target: "Email Outbound_2",
-          },
-          {
-            source: "Email Outbound_1",
-            value: 1,
-            target: "Handle Email_2",
-          },
-          {
-            source: "Handle Case_1",
-            value: 1,
-            target: "Call Outbound_2",
-          },
-          {
-            source: "Inbound Email_0",
-            value: 1,
-            target: "Handle Case_1",
-          },
-          {
-            source: "Inbound Email_0",
-            value: 1,
-            target: "Call Outbound_1",
-          },
-          {
-            source: "Inbound Call_1",
-            value: 1,
-            target: "Handle Case_2",
-          },
-          {
-            source: "Inbound Call_0",
-            value: 2,
-            target: "Call Outbound_1",
-          },
-          {
-            source: "Inbound Call_1",
-            value: 1,
-            target: "Inbound Call_2",
-          },
-          {
-            source: "Handle Case_3",
-            value: 1,
-            target: "Inbound Call_4",
-          },
-          {
-            source: "Handle Case_1",
-            value: 2,
-            target: "Inbound Call_2",
-          },
-          {
-            source: "Inbound Call_3",
-            value: 2,
-            target: "Inbound Call_4",
-          },
-          {
-            source: "Inbound Email_0",
-            value: 1,
-            target: "Inbound Email_1",
-          },
-          {
-            source: "Handle Case_1",
-            value: 2,
-            target: "Handle Case_2",
-          },
-          {
-            source: "Call Outbound_3",
-            value: 1,
-            target: "Call Outbound_4",
-          },
-          {
-            source: "Call Outbound_3",
-            value: 1,
-            target: "Handle Case_4",
-          },
-          {
-            source: "Handle Case_1",
-            value: 1,
-            target: "Email Outbound_2",
-          },
-        ],
-      },
-      groupedData: {
-        nodes: [
-          {
-            name: "Call Outbound_2_(Case32)",
-          },
-          {
-            name: "Call Outbound_3_(Case32)",
-          },
-          {
-            name: "Handle Email_1_(Case43)",
-          },
-          {
-            name: "Handle Case_2_(Case43)",
-          },
-          {
-            name: "Call Outbound_3_(Case43)",
-          },
-          {
-            name: "Handle Case_4_(Case43)",
-          },
-          {
-            name: "Email Outbound_1_(G1_Inbound EmailEmail Outbound)",
-          },
-          {
-            name: "Handle Email_2_(Case51)",
-          },
-          {
-            name: "Inbound Call_2_(G2_Inbound CallHandle CaseInbound Call)",
-          },
-          {
-            name: "Inbound Call_3_(Case38)",
-          },
-          {
-            name: "Handle Case_0_(Case20)",
-          },
-          {
-            name: "Handle Case_1_(Case20)",
-          },
-          {
-            name: "Handle Email_0_(G0_Handle Email)",
-          },
-          {
-            name: "End",
-          },
-          {
-            name: "Handle Case_1_(G1_Inbound CallHandle Case)",
-          },
-          {
-            name: "Call Outbound_2_(Case1)",
-          },
-          {
-            name: "Inbound Call_0_(G0_Inbound Call)",
-          },
-          {
-            name: "Inbound Email_0_(G0_Inbound Email)",
-          },
-          {
-            name: "Handle Case_1_(Case54)",
-          },
-          {
-            name: "Handle Case_3_(Case17)",
-          },
-          {
-            name: "Inbound Call_4_(Case17)",
-          },
-          {
-            name: "Call Outbound_1_(Case9)",
-          },
-          {
-            name: "Handle Email_2_(Case9)",
-          },
-          {
-            name: "Email Outbound_2_(Case54)",
-          },
-          {
-            name: "Inbound Email_1_(Case19)",
-          },
-          {
-            name: "Inbound Call_1_(G1_Inbound CallInbound Call)",
-          },
-          {
-            name: "Handle Case_2_(Case47)",
-          },
-          {
-            name: "Inbound Call_3_(Case47)",
-          },
-          {
-            name: "Handle Case_2_(Case17)",
-          },
-          {
-            name: "Call Outbound_1_(G1_Inbound CallCall Outbound)",
-          },
-          {
-            name: "Inbound Call_4_(Case47)",
-          },
-          {
-            name: "Handle Case_2_(Case19)",
-          },
-          {
-            name: "Inbound Call_4_(Case38)",
-          },
-          {
-            name: "Email Outbound_2_(Case40)",
-          },
-          {
-            name: "Call Outbound_5_(Case43)",
-          },
-          {
-            name: "Handle Case_3_(Case19)",
-          },
-          {
-            name: "Call Outbound_1_(G1_Handle EmailCall Outbound)",
-          },
-          {
-            name: "Call Outbound_4_(Case32)",
-          },
-          {
-            name: "Inbound Call_2_(Case6)",
-          },
-          {
-            name: "Handle Case_2_(Case20)",
-          },
-        ],
-        links: [
-          {
-            source: "Call Outbound_2_(Case32)",
-            value: 1,
-            target: "Call Outbound_3_(Case32)",
-          },
-          {
-            source: "Handle Email_1_(Case43)",
-            value: 1,
-            target: "Handle Case_2_(Case43)",
-          },
-          {
-            source: "Call Outbound_3_(Case43)",
-            value: 1,
-            target: "Handle Case_4_(Case43)",
-          },
-          {
-            source: "Email Outbound_1_(G1_Inbound EmailEmail Outbound)",
-            value: 1,
-            target: "Handle Email_2_(Case51)",
-          },
-          {
-            source: "Inbound Call_2_(G2_Inbound CallHandle CaseInbound Call)",
-            value: 1,
-            target: "Inbound Call_3_(Case38)",
-          },
-          {
-            source: "Handle Case_0_(Case20)",
-            value: 1,
-            target: "Handle Case_1_(Case20)",
-          },
-          {
-            source: "Handle Email_0_(G0_Handle Email)",
-            value: 1,
-            target: "End",
-          },
-          {
-            source: "Handle Case_1_(G1_Inbound CallHandle Case)",
-            value: 1,
-            target: "Call Outbound_2_(Case1)",
-          },
-          {
-            source: "Inbound Call_0_(G0_Inbound Call)",
-            value: 31,
-            target: "End",
-          },
-          {
-            source: "Handle Case_2_(Case43)",
-            value: 1,
-            target: "Call Outbound_3_(Case43)",
-          },
-          {
-            source: "Inbound Email_0_(G0_Inbound Email)",
-            value: 1,
-            target: "Handle Case_1_(Case54)",
-          },
-          {
-            source: "Handle Case_3_(Case17)",
-            value: 1,
-            target: "Inbound Call_4_(Case17)",
-          },
-          {
-            source: "Call Outbound_1_(Case9)",
-            value: 1,
-            target: "Handle Email_2_(Case9)",
-          },
-          {
-            source: "Handle Case_1_(Case54)",
-            value: 1,
-            target: "Email Outbound_2_(Case54)",
-          },
-          {
-            source: "Inbound Email_0_(G0_Inbound Email)",
-            value: 1,
-            target: "Inbound Email_1_(Case19)",
-          },
-          {
-            source: "Inbound Call_1_(G1_Inbound CallInbound Call)",
-            value: 1,
-            target: "Call Outbound_2_(Case32)",
-          },
-          {
-            source: "Handle Case_2_(Case47)",
-            value: 1,
-            target: "Inbound Call_3_(Case47)",
-          },
-          {
-            source: "Handle Case_1_(G1_Inbound CallHandle Case)",
-            value: 1,
-            target: "Handle Case_2_(Case17)",
-          },
-          {
-            source: "Inbound Call_0_(G0_Inbound Call)",
-            value: 2,
-            target: "Call Outbound_1_(G1_Inbound CallCall Outbound)",
-          },
-          {
-            source: "Inbound Call_3_(Case47)",
-            value: 1,
-            target: "Inbound Call_4_(Case47)",
-          },
-          {
-            source: "Inbound Email_1_(Case19)",
-            value: 1,
-            target: "Handle Case_2_(Case19)",
-          },
-          {
-            source: "Inbound Call_3_(Case38)",
-            value: 1,
-            target: "Inbound Call_4_(Case38)",
-          },
-          {
-            source: "Email Outbound_1_(G1_Inbound EmailEmail Outbound)",
-            value: 1,
-            target: "Email Outbound_2_(Case40)",
-          },
-          {
-            source: "Handle Case_4_(Case43)",
-            value: 1,
-            target: "Call Outbound_5_(Case43)",
-          },
-          {
-            source: "Inbound Call_0_(G0_Inbound Call)",
-            value: 6,
-            target: "Inbound Call_1_(G1_Inbound CallInbound Call)",
-          },
-          {
-            source: "Inbound Email_0_(G0_Inbound Email)",
-            value: 2,
-            target: "Email Outbound_1_(G1_Inbound EmailEmail Outbound)",
-          },
-          {
-            source: "Handle Case_2_(Case19)",
-            value: 1,
-            target: "Handle Case_3_(Case19)",
-          },
-          {
-            source: "Handle Case_2_(Case17)",
-            value: 1,
-            target: "Handle Case_3_(Case17)",
-          },
-          {
-            source: "Handle Email_0_(G0_Handle Email)",
-            value: 1,
-            target: "Handle Email_1_(Case43)",
-          },
-          {
-            source: "Handle Email_0_(G0_Handle Email)",
-            value: 2,
-            target: "Call Outbound_1_(G1_Handle EmailCall Outbound)",
-          },
-          {
-            source: "Inbound Email_0_(G0_Inbound Email)",
-            value: 1,
-            target: "Call Outbound_1_(Case9)",
-          },
-          {
-            source: "Call Outbound_3_(Case32)",
-            value: 1,
-            target: "Call Outbound_4_(Case32)",
-          },
-          {
-            source: "Inbound Call_1_(G1_Inbound CallInbound Call)",
-            value: 1,
-            target: "Inbound Call_2_(Case6)",
-          },
-          {
-            source: "Inbound Call_0_(G0_Inbound Call)",
-            value: 5,
-            target: "Handle Case_1_(G1_Inbound CallHandle Case)",
-          },
-          {
-            source: "Handle Case_1_(G1_Inbound CallHandle Case)",
-            value: 2,
-            target: "Inbound Call_2_(G2_Inbound CallHandle CaseInbound Call)",
-          },
-          {
-            source: "Handle Case_1_(Case20)",
-            value: 1,
-            target: "Handle Case_2_(Case20)",
-          },
-          {
-            source: "Inbound Call_1_(G1_Inbound CallInbound Call)",
-            value: 1,
-            target: "Handle Case_2_(Case47)",
-          },
-        ],
-      },
+      groupedData : {},
+      ungroupedData : {},
+      // groups
+      nodeGroup : null,
+      namesGroup : null,
+      linksGroup : null
+      // Group elements
+
     };
+  },
+
+  watch : {
+    sankeyData : function(){
+      this.groupedData = this.sankeyData.groupedModel;
+      this.ungroupedData = this.sankeyData.ungroupedModel;
+      this.$forceUpdate();
+    }
+
   },
 
   methods: {
     /**
      * Creates the three SVG group elements that make up the diagram
      */
-    createGroups: function (generatedData, svg) {
+    createGroups: function (svg) {
       this.nodeGroup = this.createNodeGroup(svg);
       this.namesGroup = this.createNamesGroup(svg);
       this.linksGroup = this.createLinksGroup(svg);
@@ -722,22 +197,27 @@ export default {
 
     // Creating a color scale with the range shcemeCategory10
     this.colorScale = d3.scaleOrdinal(d3.schemeCategory10);
-    // Generating the data for the elements
-    this.generatedData =
-      this.isGrouped === "true"
-        ? this.sankeyGenerator(this.groupedData)
-        : this.sankeyGenerator(this.ungroupedData);
-    // Updating the group
-    this.createGroups(this.generatedData, this.svg);
-    this.updateGroups(
-      this.nodeGroup,
-      this.namesGroup,
-      this.linksGroup,
-      this.generatedData
-    );
+
+    // Creating the groups
+        this.createGroups(this.svg);
+
+//     // Generating the data for the elements
+//     this.generatedData =
+//       this.isGrouped === "true"
+//         ? this.sankeyGenerator(this.groupedModel)
+//         : this.sankeyGenerator(this.ungroupedModel
+// );
+//     // Updating the group
+//     this.updateGroups(
+//       this.nodeGroup,
+//       this.namesGroup,
+//       this.linksGroup,
+//       this.generatedData
+//     );
   },
 
   updated() {
+    console.log(this.test);
     this.sankeyGenerator = d3Sankey
       .sankey()
       .nodeId((d) => d.name)
@@ -752,6 +232,7 @@ export default {
       this.isGrouped === "true"
         ? this.sankeyGenerator(this.groupedData)
         : this.sankeyGenerator(this.ungroupedData);
+
     this.updateGroups(
       this.nodeGroup,
       this.namesGroup,

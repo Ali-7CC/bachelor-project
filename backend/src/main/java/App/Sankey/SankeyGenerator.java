@@ -19,11 +19,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Holds an XLog and a App.Shared.LogProcessor and generates App.Sankey.SankeyModel(s).
+ * Class to generate SankeyModel(s).
  */
 
 @Service
 public class SankeyGenerator {
+
+    public List<SankeyModel> createSankey(XLog log, String attributeKey, String operator, String aggregationFunc){
+        SankeyModel ungroupedSankey = createSankey(log, attributeKey, operator, aggregationFunc, false);
+        SankeyModel groupedSankey = createSankey(log, attributeKey, operator, aggregationFunc, true);
+        return List.of(ungroupedSankey, groupedSankey);
+    }
+
+
 
     public SankeyModel createSankey(XLog log, String attributeKey, String operator, String aggregationFunc, boolean grouping) {
         RelationToValuesMap relationsToValues = new RelationToValuesMap(attributeKey, operator);

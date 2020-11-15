@@ -32,37 +32,49 @@
       </select>
       <select v-model="selectedAgg">
         <option value="">Select an aggregator</option>
+        <option value="SUM">Sum</option>
         <option value="MAX">Max</option>
         <option value="MIN">Min</option>
         <option value="AVG">Average</option>
       </select>
       <button v-on:click="onDraw">Draw</button>
     </div>
+    <div id="nav">
+      <select v-model="selectedVis">
+        <option value="sankey" selected>Sankey</option>
+        <option value="chord">Chord</option>
+      </select>
+    </div>
+    <Sankey :sankey-data="sankeyData"></Sankey>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import Sankey from "./Sankey.vue"
 
 export default {
+  components : {
+    "Sankey" : Sankey
+  },
   data() {
     return {
-      // Children
-      visualizations : [],
       // File upload
       selectedFileUpload: "",
       files: [],
-      // Drawing
+      // Drawing parameters
       selectedFileDraw: null,
       selectedAttr: "",
       selectedOp: "",
       selectedAgg: "",
+      selectedVis : "sankey",
+      // Sankey data
+      sankeyData : ""
+      // Chord Data
     };
   },
 
-  created(){
-    this.visualizations = this.$children;
-  },
+
 
   methods: {
     onFileSelected: function (event) {
@@ -78,23 +90,20 @@ export default {
           attributes: res.data.validAttributes,
         };
         this.files.push(newFile);
-        console.log(newFile);
         this.selectedFileUpload = null;
       });
     },
 
-    onDraw : () => {
+    onDraw : function() {
       const payload = new FormData();
       payload.append("fileName", this.selectedFileDraw);
       payload.append("attributeKey", this.selectedAttr);
       payload.append("operation", this.selectedOp);
       payload.append("aggregationFunc", this.selectedAgg);
-
-      // axios.post("http://localhost:8080/sankey",payload.then(res => {
-
-
-      // }))
-
+      if(this.selectedVis === "sankey"){
+      axios.post("http://localhost:8080/createSankey",payload).then(res => {
+        this.sankeyData = res.data;
+      })}
     }
   },
 };
