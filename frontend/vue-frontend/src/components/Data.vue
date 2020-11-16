@@ -46,6 +46,7 @@
       </select>
     </div>
     <Sankey :sankey-data="sankeyData"></Sankey>
+
   </div>
 </template>
 
@@ -69,7 +70,7 @@ export default {
       selectedAgg: "",
       selectedVis : "sankey",
       // Sankey data
-      sankeyData : ""
+      sankeyData : "",
       // Chord Data
     };
   },
@@ -103,6 +104,7 @@ export default {
       if(this.selectedVis === "sankey"){
       axios.post("http://localhost:8080/createSankey",payload).then(res => {
         this.sankeyData = res.data;
+
       })}
     }
   },

@@ -28,67 +28,121 @@ import * as d3 from "d3";
 import * as d3Sankey from "d3-sankey";
 
 export default {
-  props : ["sankeyData"],
+  props: ["sankeyData"],
   data() {
     return {
-      colorScale: {},
-      svg: {},
       WIDTH: 900,
       HEIGHT: 400,
       alignment: "sankeyLeft",
       color: "input",
       isGrouped: "false",
-      groupedData : {},
-      ungroupedData : {},
-      // groups
-      nodeGroup : null,
-      namesGroup : null,
-      linksGroup : null
-      // Group elements
-
+      // Raw data from parent component
+      groupedData: {nodes : [], links : []},
+      ungroupedData: {nodes : [], links :[]},
     };
   },
 
-  watch : {
-    sankeyData : function(){
-      this.groupedData = this.sankeyData.groupedModel;
-      this.ungroupedData = this.sankeyData.ungroupedModel;
-      this.$forceUpdate();
-    }
-
-  },
-
-  methods: {
+  computed: {
     /**
-     * Creates the three SVG group elements that make up the diagram
+     * Adds the svg element to the DOM
      */
-    createGroups: function (svg) {
-      this.nodeGroup = this.createNodeGroup(svg);
-      this.namesGroup = this.createNamesGroup(svg);
-      this.linksGroup = this.createLinksGroup(svg);
+    svg: function () {
+      return d3
+        .select("#sankey-container")
+        .append("svg")
+        .attr("viewBox", [0, 0, this.WIDTH, this.HEIGHT]);
+    },
+
+  /**
+   * Defines the color scale with the range schemeCategory10
+   */
+    colorScale: function () {
+      return d3.scaleOrdinal(d3.schemeCategory10);
+    },
+
+  /**
+   * Defines the sankey generator with configuration based on the component data
+   */
+    sankeyGenerator: function () {
+      return (
+        d3Sankey
+          .sankey()
+          .nodeId((d) => d.name)
+          .nodeWidth(15)
+          .nodePadding(5)
+          .nodeAlign(d3Sankey[this.alignment])
+          // Defines the layout. [left, top], [right, bottom]
+          .extent([
+            [0, 0],
+            [this.WIDTH, this.HEIGHT],
+          ])
+      );
+    },
+
+  /**
+   * Computes the data used to draw the Sankey diagram using the Sankey generator and the raw data.
+   */
+    generatedData: function () {
+      const data =
+        this.isGrouped === "true"
+          ? this.sankeyGenerator(this.groupedData)
+          : this.sankeyGenerator(this.ungroupedData);
+      return data;
     },
 
     /**
-     * Updates the three SVG group elements when any of the diagrams data changes.
+     * SVG group element that holds the nodes.
+     * A node consists of a rect element, which in turn contains a title element
      */
-    updateGroups: function (nodeGroup, namesGroup, linksGroup, generatedData) {
-      this.updateRects(nodeGroup, generatedData);
-      this.updateNames(namesGroup, generatedData);
-      this.updateLinksGroup(linksGroup, generatedData);
-    },
-
-    createNodeGroup: function (svg) {
-      const nodeGroup = svg
+    nodesGroup: function () {
+      return this.svg
         .append("g")
         .attr("stroke", "#000")
         .attr("stroke-width", 1);
-      return nodeGroup;
     },
 
-    updateRects: function (nodeGroup, generatedData) {
-      nodeGroup
+    /**
+     * SVG group element that holds node labels of the Sankey diagram.
+     *  A label is represented by an SVG text element.
+     */
+    namesGroup: function () {
+      return this.svg
+        .append("g")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", 8)
+        .attr("font-weight", "bold");
+    },
+
+    /**
+     * SVG group that holds the links of the Sankey diagram.
+     * A link consists of a group that contains a path and a title element
+     */
+    linksGroup: function () {
+      return this.svg.append("g").attr("fill", "none").attr("stroke-opacity", 0.5);
+    },
+  },
+
+  watch: {
+    /**
+     * Watching changes to the data passed from the parent component to rerender the diagram
+     */
+    sankeyData: function () {
+      this.groupedData = Object.assign({}, this.groupedData, { nodes:  this.sankeyData.groupedModel.nodes, links: this.sankeyData.groupedModel.links });
+      this.ungroupedData = Object.assign({}, this.ungroupedData, { nodes:  this.sankeyData.ungroupedModel.nodes, links : this.sankeyData.ungroupedModel.links });
+      this.$forceUpdate();
+    },
+  },
+  
+
+  methods: {
+    /**
+     * Updates nodesGroup when data changes
+     */
+    updateNodesGroup: function () {
+      // Joining the new rect elements
+      this.nodesGroup
         .selectAll("rect")
-        .data(generatedData.nodes)
+        .data(this.generatedData.nodes)
         .join("rect")
         .attr("x", (d) => d.x0)
         .attr("y", (d) => d.y0)
@@ -96,32 +150,21 @@ export default {
         .attr("width", (d) => d.x1 - d.x0)
         .attr("fill", (d) => this.colorScale(d.name.split("_")[0]));
 
-      // Removing old title elements before appending.
-      nodeGroup.selectAll("rect").selectAll("title").remove();
-      nodeGroup
+      // Removing old title elements (inside the rects)
+      this.nodesGroup.selectAll("rect").selectAll("title").remove();
+      // Adding new title elements to the rects
+      this.nodesGroup
         .selectAll("rect")
         .append("title")
         .text((d) => `${d.name}\n${d.value}`);
-
-      // Returning the rects
-      const updatedRects = nodeGroup.selectAll("rect");
-
-      return updatedRects;
     },
-
-    createNamesGroup: function (svg) {
-      const namesGroup = svg
-        .append("g")
-        .attr("font-family", "sans-serif")
-        .attr("font-size", 8)
-        .attr("font-weight", "bold");
-
-      return namesGroup;
-    },
-    updateNames: function (namesGroup, generatedData) {
-      const updateNames = namesGroup
+    /**
+     * Updates namesGroup when data changes
+     */
+    updateNamesGroup: function () {
+      this.namesGroup
         .selectAll("text")
-        .data(generatedData.nodes)
+        .data(this.generatedData.nodes)
         .join("text")
         .attr("x", (d) => (d.x0 < this.WIDTH / 2 ? d.x1 + 6 : d.x0 - 6))
         .attr("y", (d) => (d.y1 + d.y0) / 2)
@@ -129,23 +172,15 @@ export default {
         .attr("text-anchor", (d) => (d.x0 < this.WIDTH / 2 ? "start" : "end"))
         .text((d) => d.name.split("_")[0]);
 
-      return updateNames;
     },
-
-    createLinksGroup: function (svg) {
-      const linksGroup = svg
-        .append("g")
-        .attr("fill", "none")
-        .attr("stroke-opacity", 0.5);
-
-      return linksGroup;
-    },
-
-    updateLinksGroup: function (linksGroup, generatedData) {
+    /**
+     * Updates linksGroup when data changes
+     */
+    updateLinksGroup: function () {
       // Joining new groups
-      const links = linksGroup
+      const links = this.linksGroup
         .selectAll("g")
-        .data(generatedData.links)
+        .data(this.generatedData.links)
         .join("g");
 
       // Removing old paths and adding new ones
@@ -171,74 +206,15 @@ export default {
         .append("title")
         .text((d) => `${d.source.name} → ${d.target.name}\n${d.value}`);
 
-      return linksGroup.selectAll("g");
     },
   },
-
-  mounted() {
-    // Creating an SVG element in the HTML
-    this.svg = d3
-      .select("#sankey-container")
-      .append("svg")
-      .attr("viewBox", [0, 0, this.WIDTH, this.HEIGHT]);
-
-    // Creating the Sankey generator
-    this.sankeyGenerator = d3Sankey
-      .sankey()
-      .nodeId((d) => d.name)
-      .nodeWidth(15)
-      .nodePadding(5)
-      .nodeAlign(d3Sankey[this.alignment])
-      // Defines the layout. [left, top], [right, bottom]
-      .extent([
-        [0, 0],
-        [this.WIDTH, this.HEIGHT],
-      ]);
-
-    // Creating a color scale with the range shcemeCategory10
-    this.colorScale = d3.scaleOrdinal(d3.schemeCategory10);
-
-    // Creating the groups
-        this.createGroups(this.svg);
-
-//     // Generating the data for the elements
-//     this.generatedData =
-//       this.isGrouped === "true"
-//         ? this.sankeyGenerator(this.groupedModel)
-//         : this.sankeyGenerator(this.ungroupedModel
-// );
-//     // Updating the group
-//     this.updateGroups(
-//       this.nodeGroup,
-//       this.namesGroup,
-//       this.linksGroup,
-//       this.generatedData
-//     );
-  },
-
+  /**
+   * Fires when data changes
+   */
   updated() {
-    console.log(this.test);
-    this.sankeyGenerator = d3Sankey
-      .sankey()
-      .nodeId((d) => d.name)
-      .nodeWidth(15)
-      .nodePadding(5)
-      .nodeAlign(d3Sankey[this.alignment])
-      .extent([
-        [0, 0],
-        [this.WIDTH, this.HEIGHT],
-      ]);
-    this.generatedData =
-      this.isGrouped === "true"
-        ? this.sankeyGenerator(this.groupedData)
-        : this.sankeyGenerator(this.ungroupedData);
-
-    this.updateGroups(
-      this.nodeGroup,
-      this.namesGroup,
-      this.linksGroup,
-      this.generatedData
-    );
+    this.updateNodesGroup();
+    this.updateNamesGroup();
+    this.updateLinksGroup();
   },
 };
 </script>
