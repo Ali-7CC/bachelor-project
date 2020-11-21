@@ -36,7 +36,7 @@ public class SankeyGenerator {
     public SankeyModel createSankey(XLog log, String attributeKey, String operator, String aggregationFunc, boolean grouping) {
         RelationToValuesMap relationsToValues = new RelationToValuesMap(attributeKey, operator);
         if (grouping) {
-            TraceGroupsMap groups = findTraceGroups(log);
+            TraceGroupsMap groups = findTraceGroups(log, attributeKey);
             for (XTrace trace : log) {
                 relationsToValues = this.groupedRelationToValues(trace, attributeKey, operator, groups, relationsToValues);
             }
@@ -87,7 +87,7 @@ public class SankeyGenerator {
 
             // Naming the source node based on the grouping
             String sourceAttributeName = sourceAttribute.toString();
-            String sourceGroupName = groups.makeGroupName(trace, 0);
+            String sourceGroupName = groups.makeGroupName(trace,attrKey, 0);
             relation.eventNames.add(sourceAttributeName + "_0_" + "(" + sourceGroupName + ")");
 
             // Adding a target node
@@ -127,8 +127,8 @@ public class SankeyGenerator {
                 // Naming the nodes based on the grouping
                 String sourceAttributeName = sourceAttribute.toString();
                 String targetAttributeName = targetAttribute.toString();
-                String sourceGroupName = groups.makeGroupName(trace, i);
-                String targetGroupName = groups.makeGroupName(trace, i + 1);
+                String sourceGroupName = groups.makeGroupName(trace, attrKey, i);
+                String targetGroupName = groups.makeGroupName(trace, attrKey, i + 1);
                 relation.eventNames.add(sourceAttributeName + "_" + (i) + "_" + "(" + sourceGroupName + ")");
                 relation.eventNames.add(targetAttributeName + "_" + (i + 1) + "_" + "(" + targetGroupName + ")");
 
@@ -192,7 +192,7 @@ public class SankeyGenerator {
      * @return A TraceGroupMap that maps the index to which the traces share their first activities to
      * the list of App.Sankey.TraceGroup
      */
-    public TraceGroupsMap findTraceGroups(List<XTrace> log) {
+    public TraceGroupsMap findTraceGroups(List<XTrace> log, String attrKey) {
         HashMap<Integer, List<TraceGroup>> groupsMap = new HashMap<>();
         List<TraceGroup> groupsMaster = new ArrayList<>();
         TraceGroup initialGroup = new TraceGroup();
@@ -202,7 +202,7 @@ public class SankeyGenerator {
         while (!groupsMaster.isEmpty()) {
             List<TraceGroup> newMaster = new ArrayList<>();
             for (TraceGroup group : groupsMaster) {
-                List<TraceGroup> newGroups = groupBynthActivity(group, position);
+                List<TraceGroup> newGroups = groupBynthActivity(group, attrKey, position);
                 for (TraceGroup newGroup : newGroups) {
                     if (newGroup.traces.size() > 1) {
                         // Updating the groupsMap with the new groups
@@ -240,7 +240,7 @@ public class SankeyGenerator {
      * @return A list of App.Sankey.TraceGroup. Each App.Sankey.TraceGroup in that list that contains 2 or more traces share
      * the first n activities.
      */
-    public List<TraceGroup> groupBynthActivity(TraceGroup group, int n) {
+    public List<TraceGroup> groupBynthActivity(TraceGroup group, String attrKey, int n) {
         // Initializing the list to be returned
         List<TraceGroup> traceGroups = new ArrayList<>();
         // Traces that are shorter or equal to n are immediately made into a new App.Sankey.TraceGroup and added to the
@@ -257,10 +257,10 @@ public class SankeyGenerator {
         }
         // Grouping the longer traces
         List<List<XTrace>> groups = longGroups.traces.stream().collect(Collectors
-                .groupingBy(trace -> trace.get(n).getAttributes().get("Activity")))
+                .groupingBy(trace -> trace.get(n).getAttributes().get(attrKey)))
                 .values().stream().collect(Collectors.toList());
 
-        // Constructing the new trace groups that share their activities up to index n.
+        // Constructing the new trace groups that share their attribute up to index n.
         for (List<XTrace> newGroup : groups) {
             TraceGroup newTraceGroup = new TraceGroup();
             newTraceGroup.traces = newGroup;

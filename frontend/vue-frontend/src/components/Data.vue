@@ -39,14 +39,20 @@
       </select>
       <button v-on:click="onDraw">Draw</button>
     </div>
-    <div id="nav">
+    <div id="tabs">
+      <button v-for="tab in tabs" :key="tab" @click="currentTab = tab">{{ tab }}</button>
+      <keep-alive>
+        <component :is="currentTabComponent" :raw-data="currentProps"></component>
+      </keep-alive>
+    </div>
+    <!-- <div id="nav">
       <select v-model="selectedVis">
         <option value="sankey" selected>Sankey</option>
         <option value="chord">Chord</option>
       </select>
     </div>
     <Sankey :sankey-data="sankeyData"></Sankey>
-    <Chord :chord-data="chordData"></Chord>
+    <Chord :chord-data="chordData"></Chord> -->
   </div>
 </template>
 
@@ -70,12 +76,23 @@ export default {
       selectedAttr: "",
       selectedOp: "",
       selectedAgg: "",
-      selectedVis: "sankey",
+      // Tabs
+      tabs : ["Sankey", "Chord"],
+      currentTab : "Sankey",
       // Sankey data
       sankeyData: "",
       // Chord Data
       chordData: "",
     };
+  },
+
+  computed : {
+    currentTabComponent : function(){
+      return this.currentTab.toLowerCase();
+    },
+    currentProps : function(){
+      if (this.currentTabComponent === "sankey") {return this.sankeyData} else {return this.chordData}
+    }
   },
 
   methods: {
@@ -102,13 +119,13 @@ export default {
       payload.append("attributeKey", this.selectedAttr);
       payload.append("operation", this.selectedOp);
       payload.append("aggregationFunc", this.selectedAgg);
-      if (this.selectedVis === "sankey") {
+      if (this.currentTabComponent === "sankey") {
         axios
           .post("http://localhost:8080/createSankey", payload)
           .then((res) => {
             this.sankeyData = res.data;
           });
-      } else if (this.selectedVis === "chord") {
+      } else if (this.currentTabComponent === "chord") {
         axios.post("http://localhost:8080/createChord", payload).then((res) => {
           this.chordData = res.data;
         });

@@ -8,7 +8,7 @@
 <script>
 import * as d3 from "d3";
 export default {
-  props: ["chordData"],
+  props: ["rawData"],
   data() {
     return {
       width: 1400,
@@ -23,9 +23,9 @@ export default {
    * Fires when new data is loaded from parent component
    */
   watch: {
-    chordData: function () {
-      this.matrix = this.chordData.matrix;
-      this.nodes = this.chordData.nodes;
+    rawData: function () {
+      this.matrix = this.rawData.matrix;
+      this.nodes = this.rawData.nodes;
       this.$forceUpdate();
     },
   },

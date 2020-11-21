@@ -28,7 +28,7 @@ import * as d3 from "d3";
 import * as d3Sankey from "d3-sankey";
 
 export default {
-  props: ["sankeyData"],
+  props: ["rawData"],
   data() {
     return {
       WIDTH: 900,
@@ -128,14 +128,14 @@ export default {
     /**
      * Watching changes to the data passed from the parent component to rerender the diagram
      */
-    sankeyData: function () {
+    rawData: function () {
       this.groupedData = Object.assign({}, this.groupedData, {
-        nodes: this.sankeyData.groupedModel.nodes,
-        links: this.sankeyData.groupedModel.links,
+        nodes: this.rawData.groupedModel.nodes,
+        links: this.rawData.groupedModel.links,
       });
       this.ungroupedData = Object.assign({}, this.ungroupedData, {
-        nodes: this.sankeyData.ungroupedModel.nodes,
-        links: this.sankeyData.ungroupedModel.links,
+        nodes: this.rawData.ungroupedModel.nodes,
+        links: this.rawData.ungroupedModel.links,
       });
       this.$forceUpdate();
     },
