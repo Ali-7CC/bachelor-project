@@ -128,6 +128,8 @@ fetch("test.json").then(response => response.json()).then(json => {
         : `${names[d.index]} ↓`;
     });
 
+    console.log(group);
+
 
 
 
@@ -143,6 +145,10 @@ fetch("test.json").then(response => response.json()).then(json => {
     .attr("d", ribbon)
     .append("title")
     .text(d => `${d.source.value} ${names[d.source.index]} -> ${names[d.target.index]}\n${d.target.value} ${names[d.target.index]} -> ${names[d.source.index]}`);
+
+
+
+console.log(svg.selectAll("g"))
 
 
 

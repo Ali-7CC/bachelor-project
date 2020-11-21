@@ -5,6 +5,7 @@ import App.Shared.Relation;
 import App.Shared.RelationToValuesMap;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,17 +15,13 @@ import java.util.stream.Collectors;
 /**
  * Holds an XLog and a App.Shared.LogProcessor and generates App.Chord.ChordModel(s).
  */
+
+@Service
 public class ChordGenerator {
-    private XLog log;
 
-    public ChordGenerator(XLog log, LogProcessor processor) {
-        this.log = log;
-    }
-
-
-    public ChordModel createChord(String attributeKey, String operator, String aggregationFunc) {
+    public ChordModel createChord(XLog log, String attributeKey, String operator, String aggregationFunc) {
         RelationToValuesMap relationsToValues = new RelationToValuesMap(attributeKey, operator);
-        for (XTrace trace : this.log) {
+        for (XTrace trace : log) {
             relationsToValues = LogProcessor.relationToValues(trace, attributeKey, operator,
                     false, relationsToValues);
         }

@@ -38,7 +38,6 @@ public class SankeyController {
             return new ResponseEntity<>(body, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Error");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

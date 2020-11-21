@@ -7,14 +7,14 @@
     </div>
     <div id="draw-container">
       <select v-model="selectedFileDraw">
-        <option value=null>Select a file</option>
+        <option value="null">Select a file</option>
         <option v-for="file in this.files" v-bind:key="file.name">
           {{ file.name }}
         </option>
       </select>
       <select v-model="selectedAttr">
         <option value="">Select an attribute</option>
-        <template v-if="selectedFileDraw !=null">
+        <template v-if="selectedFileDraw != null">
           <option
             v-for="attr in files.find((f) => f.name === selectedFileDraw)
               .attributes"
@@ -46,17 +46,19 @@
       </select>
     </div>
     <Sankey :sankey-data="sankeyData"></Sankey>
-
+    <Chord :chord-data="chordData"></Chord>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import Sankey from "./Sankey.vue"
+import Sankey from "./Sankey.vue";
+import Chord from "./Chord.vue";
 
 export default {
-  components : {
-    "Sankey" : Sankey
+  components: {
+    Sankey: Sankey,
+    Chord: Chord,
   },
   data() {
     return {
@@ -68,14 +70,13 @@ export default {
       selectedAttr: "",
       selectedOp: "",
       selectedAgg: "",
-      selectedVis : "sankey",
+      selectedVis: "sankey",
       // Sankey data
-      sankeyData : "",
+      sankeyData: "",
       // Chord Data
+      chordData: "",
     };
   },
-
-
 
   methods: {
     onFileSelected: function (event) {
@@ -95,18 +96,24 @@ export default {
       });
     },
 
-    onDraw : function() {
+    onDraw: function () {
       const payload = new FormData();
       payload.append("fileName", this.selectedFileDraw);
       payload.append("attributeKey", this.selectedAttr);
       payload.append("operation", this.selectedOp);
       payload.append("aggregationFunc", this.selectedAgg);
-      if(this.selectedVis === "sankey"){
-      axios.post("http://localhost:8080/createSankey",payload).then(res => {
-        this.sankeyData = res.data;
-
-      })}
-    }
+      if (this.selectedVis === "sankey") {
+        axios
+          .post("http://localhost:8080/createSankey", payload)
+          .then((res) => {
+            this.sankeyData = res.data;
+          });
+      } else if (this.selectedVis === "chord") {
+        axios.post("http://localhost:8080/createChord", payload).then((res) => {
+          this.chordData = res.data;
+        });
+      }
+    },
   },
 };
 </script>

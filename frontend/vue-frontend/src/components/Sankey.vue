@@ -9,7 +9,7 @@
         <option value="sankeyJustify">Justified</option>
       </select>
 
-      <select v-model="color" id="color">
+      <select @change="onColorChange" id="color">
         <option value="input">Color by input</option>
         <option value="output">Color by output</option>
       </select>
@@ -34,11 +34,10 @@ export default {
       WIDTH: 900,
       HEIGHT: 400,
       alignment: "sankeyLeft",
-      color: "input",
       isGrouped: "false",
       // Raw data from parent component
-      groupedData: {nodes : [], links : []},
-      ungroupedData: {nodes : [], links :[]},
+      groupedData: { nodes: [], links: [] },
+      ungroupedData: { nodes: [], links: [] },
     };
   },
 
@@ -53,16 +52,16 @@ export default {
         .attr("viewBox", [0, 0, this.WIDTH, this.HEIGHT]);
     },
 
-  /**
-   * Defines the color scale with the range schemeCategory10
-   */
+    /**
+     * Defines the color scale with the range schemeCategory10
+     */
     colorScale: function () {
       return d3.scaleOrdinal(d3.schemeCategory10);
     },
 
-  /**
-   * Defines the sankey generator with configuration based on the component data
-   */
+    /**
+     * Defines the sankey generator with configuration based on the component's data
+     */
     sankeyGenerator: function () {
       return (
         d3Sankey
@@ -79,9 +78,9 @@ export default {
       );
     },
 
-  /**
-   * Computes the data used to draw the Sankey diagram using the Sankey generator and the raw data.
-   */
+    /**
+     * Computes the data used to draw the Sankey diagram using the Sankey generator and the raw data.
+     */
     generatedData: function () {
       const data =
         this.isGrouped === "true"
@@ -92,7 +91,7 @@ export default {
 
     /**
      * SVG group element that holds the nodes.
-     * A node consists of a rect element, which in turn contains a title element
+     * A node consists of a rect element that contains a title element
      */
     nodesGroup: function () {
       return this.svg
@@ -118,7 +117,10 @@ export default {
      * A link consists of a group that contains a path and a title element
      */
     linksGroup: function () {
-      return this.svg.append("g").attr("fill", "none").attr("stroke-opacity", 0.5);
+      return this.svg
+        .append("g")
+        .attr("fill", "none")
+        .attr("stroke-opacity", 0.5);
     },
   },
 
@@ -127,37 +129,46 @@ export default {
      * Watching changes to the data passed from the parent component to rerender the diagram
      */
     sankeyData: function () {
-      this.groupedData = Object.assign({}, this.groupedData, { nodes:  this.sankeyData.groupedModel.nodes, links: this.sankeyData.groupedModel.links });
-      this.ungroupedData = Object.assign({}, this.ungroupedData, { nodes:  this.sankeyData.ungroupedModel.nodes, links : this.sankeyData.ungroupedModel.links });
+      this.groupedData = Object.assign({}, this.groupedData, {
+        nodes: this.sankeyData.groupedModel.nodes,
+        links: this.sankeyData.groupedModel.links,
+      });
+      this.ungroupedData = Object.assign({}, this.ungroupedData, {
+        nodes: this.sankeyData.ungroupedModel.nodes,
+        links: this.sankeyData.ungroupedModel.links,
+      });
       this.$forceUpdate();
     },
   },
-  
 
   methods: {
     /**
      * Updates nodesGroup when data changes
      */
     updateNodesGroup: function () {
-      // Joining the new rect elements
+      // Update the rect element (add new, remove old) for the new data set
+      // For each new rect, add am empty title element to it
       this.nodesGroup
         .selectAll("rect")
         .data(this.generatedData.nodes)
-        .join("rect")
+        .join((enter) => enter.append("rect").append("title"));
+
+      // For all rect elements, update their attributes
+      this.nodesGroup
+        .selectAll("rect")
         .attr("x", (d) => d.x0)
         .attr("y", (d) => d.y0)
         .attr("height", (d) => d.y1 - d.y0)
         .attr("width", (d) => d.x1 - d.x0)
         .attr("fill", (d) => this.colorScale(d.name.split("_")[0]));
 
-      // Removing old title elements (inside the rects)
-      this.nodesGroup.selectAll("rect").selectAll("title").remove();
-      // Adding new title elements to the rects
+      // For all title elements inside rect elements, update their text
       this.nodesGroup
         .selectAll("rect")
-        .append("title")
-        .text((d) => `${d.name}\n${d.value}`);
+        .select("title")
+        .text((d) => `${d.name.split("_")[0]}\n${d.value}`);
     },
+
     /**
      * Updates namesGroup when data changes
      */
@@ -169,49 +180,69 @@ export default {
         .attr("x", (d) => (d.x0 < this.WIDTH / 2 ? d.x1 + 6 : d.x0 - 6))
         .attr("y", (d) => (d.y1 + d.y0) / 2)
         .attr("dy", "0.35em")
+        // Tags the labels with eitehr "start" or "end" based on their position
         .attr("text-anchor", (d) => (d.x0 < this.WIDTH / 2 ? "start" : "end"))
         .text((d) => d.name.split("_")[0]);
-
     },
+
     /**
      * Updates linksGroup when data changes
      */
     updateLinksGroup: function () {
-      // Joining new groups
-      const links = this.linksGroup
+      // Update the groups (add new, remove old) for the new data
+      // For each new group, add an empty path element to it
+      this.linksGroup
         .selectAll("g")
         .data(this.generatedData.links)
-        .join("g");
+        .join((enter) => {
+          const newLinkGroup = enter.append("g");
+          newLinkGroup.append("path");
+          newLinkGroup.append("title");
+        });
 
-      // Removing old paths and adding new ones
-      links.selectAll("path").remove();
-      links
-        .append("path")
+      // Selecting the links groups
+      const linksGroups = this.linksGroup.selectAll("g");
+
+      // For each group, update its path attribute
+      linksGroups
+        .select("path")
         .attr("d", d3Sankey.sankeyLinkHorizontal())
-        .attr("stroke", (d) => {
-          const option = document.querySelector("#color").value;
-          console.log(option);
-          if (this.color === "input") {
-            return this.colorScale(d.source.name.split("_")[0]);
-          } else {
-            return this.colorScale(d.target.name.split("_")[0]);
-          }
-        })
-
+        .attr("stroke", (d) => this.colorScale(d.source.name.split("_")[0]))
         .attr("stroke-width", (d) => Math.max(1, d.width));
 
-      // Removing old titles and adding new ones
-      links.selectAll("title").remove();
-      links
-        .append("title")
-        .text((d) => `${d.source.name} → ${d.target.name}\n${d.value}`);
+      // For each group, update its title element
+      linksGroups
+        .select("title")
+        .text(
+          (d) =>
+            `${d.source.name.split("_")[0]} → ${
+              d.target.name.split("_")[0].split("_")[0]
+            }\n${d.value}`
+        );
+    },
 
+    /**
+     * Changes the color attribute for the links path elements.
+     * Using an event listener to change one attribute instead of redrawing the entire diagram
+     * (compared to alignment or groupping sliders)
+     */
+    onColorChange: function (e) {
+      const option = e.target.value;
+      if (option === "input") {
+        this.linksGroup
+          .selectAll("g")
+          .select("path")
+          .attr("stroke", (d) => this.colorScale(d.source.name.split("_")[0]));
+      } else {
+        this.linksGroup
+          .selectAll("g")
+          .select("path")
+          .attr("stroke", (d) => this.colorScale(d.target.name.split("_")[0]));
+      }
     },
   },
-  /**
-   * Fires when data changes
-   */
-  updated() {
+
+  beforeUpdate() {
     this.updateNodesGroup();
     this.updateNamesGroup();
     this.updateLinksGroup();

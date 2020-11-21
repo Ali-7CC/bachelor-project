@@ -19,15 +19,10 @@ public class ChordModel {
     }
 
 
-    public JSONArray toJSON() {
-        JSONArray result = new JSONArray();
-        JSONObject matrix = new JSONObject();
-        JSONObject nodes = new JSONObject();
-        matrix.put("matrix", this.matrix);
-        nodes.put("nodes", this.nodes);
-
-        result.put(matrix);
-        result.put(nodes);
-        return result;
+    public String toJSONString() {
+        JSONObject result = new JSONObject();
+        result.put("matrix", this.matrix);
+        result.put("nodes", this.nodes);
+        return result.toString();
     }
 }
