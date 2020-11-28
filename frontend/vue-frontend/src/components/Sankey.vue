@@ -146,16 +146,24 @@ export default {
      * Updates nodesGroup when data changes
      */
     updateNodesGroup: function () {
-      // Update the rect element (add new, remove old) for the new data set
-      // For each new rect, add am empty title element to it
-      this.nodesGroup
+      // The update selection
+      const nodes = this.nodesGroup
         .selectAll("rect")
-        .data(this.generatedData.nodes)
-        .join((enter) => enter.append("rect").append("title"));
+        .data(this.generatedData.nodes);
+      // .join((enter) => enter.append("rect").append("title"));
+
+      // Removing the exit selection
+      nodes.exit().remove();
+
+      // The enter selection
+      const newNodes = nodes.enter().append("rect");
+      newNodes.append("title");
+
+      // The merged selection
+      const allNodes = newNodes.merge(nodes);
 
       // For all rect elements, update their attributes
-      this.nodesGroup
-        .selectAll("rect")
+      allNodes
         .attr("x", (d) => d.x0)
         .attr("y", (d) => d.y0)
         .attr("height", (d) => d.y1 - d.y0)
@@ -163,8 +171,7 @@ export default {
         .attr("fill", (d) => this.colorScale(d.name.split("_")[0]));
 
       // For all title elements inside rect elements, update their text
-      this.nodesGroup
-        .selectAll("rect")
+      allNodes
         .select("title")
         .text((d) => `${d.name.split("_")[0]}\n${d.value}`);
     },
@@ -173,10 +180,21 @@ export default {
      * Updates namesGroup when data changes
      */
     updateNamesGroup: function () {
-      this.namesGroup
+      // The update selection
+      const names = this.namesGroup
         .selectAll("text")
-        .data(this.generatedData.nodes)
-        .join("text")
+        .data(this.generatedData.nodes);
+
+      // Removing the exit selection
+      names.exit().remove();
+
+      // The enter selection
+      const newNames = names.enter().append("text");
+
+      // Merged selection
+      const allNames = newNames.merge(names);
+
+      allNames
         .attr("x", (d) => (d.x0 < this.WIDTH / 2 ? d.x1 + 6 : d.x0 - 6))
         .attr("y", (d) => (d.y1 + d.y0) / 2)
         .attr("dy", "0.35em")
@@ -189,29 +207,31 @@ export default {
      * Updates linksGroup when data changes
      */
     updateLinksGroup: function () {
-      // Update the groups (add new, remove old) for the new data
-      // For each new group, add an empty path element to it
-      this.linksGroup
+      // Update selection
+      const links = this.linksGroup
         .selectAll("g")
-        .data(this.generatedData.links)
-        .join((enter) => {
-          const newLinkGroup = enter.append("g");
-          newLinkGroup.append("path");
-          newLinkGroup.append("title");
-        });
+        .data(this.generatedData.links);
 
-      // Selecting the links groups
-      const linksGroups = this.linksGroup.selectAll("g");
+      // Removing exit selection
+      links.exit().remove();
+
+      // Enter selection
+      const newLinks = links.enter().append("g");
+      newLinks.append("path");
+      newLinks.append("title");
+
+      // Merged selection
+      const allLinks = newLinks.merge(links);
 
       // For each group, update its path attribute
-      linksGroups
+      allLinks
         .select("path")
         .attr("d", d3Sankey.sankeyLinkHorizontal())
         .attr("stroke", (d) => this.colorScale(d.source.name.split("_")[0]))
         .attr("stroke-width", (d) => Math.max(1, d.width));
 
       // For each group, update its title element
-      linksGroups
+      allLinks
         .select("title")
         .text(
           (d) =>
