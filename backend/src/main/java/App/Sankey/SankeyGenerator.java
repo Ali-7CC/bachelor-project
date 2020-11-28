@@ -186,7 +186,7 @@ public class SankeyGenerator {
 
 
     /**
-     * Finds the TraceGroups for a given event log and returns a App.Sankey.TraceGroupsMap with the found trace groups.
+     * Finds the TraceGroups for a given event log and returns a TraceGroupsMap with the found trace groups.
      *
      * @param log An event log of type XLog or List<XTrace>
      * @return A TraceGroupMap that maps the index to which the traces share their first activities to

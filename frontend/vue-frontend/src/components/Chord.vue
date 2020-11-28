@@ -1,6 +1,12 @@
 <template>
   <div>
     <h1>Chord Diagram</h1>
+    <div id="view-options">
+      <select v-model="diagramType">
+        <option value="directed">Directed Diagarm</option>
+        <option value="undirected">Undirected Diagram</option>
+      </select>
+    </div>
     <div id="chord-container"></div>
   </div>
 </template>
@@ -11,8 +17,9 @@ export default {
   props: ["rawData"],
   data() {
     return {
-      width: 1400,
+      width: 1900,
       height: 1000,
+      diagramType: "directed",
       // Raw data from parent component
       matrix: [],
       nodes: [],
@@ -81,11 +88,19 @@ export default {
      * Defines the Chord generator with configuration based on the component's data
      */
     chordGenerator: function () {
-      return d3
-        .chordDirected()
-        .padAngle(10 / this.innerRadius)
-        .sortSubgroups(d3.descending)
-        .sortChords(d3.descending);
+      if (this.diagramType === "directed") {
+        return d3
+          .chordDirected()
+          .padAngle(10 / this.innerRadius)
+          .sortSubgroups(d3.descending)
+          .sortChords(d3.descending);
+      } else {
+        return d3
+          .chord()
+          .padAngle(10 / this.innerRadius)
+          .sortSubgroups(d3.descending)
+          .sortChords(d3.descending);
+      }
     },
     /**
      * Computes the data used to draw the Chord diagram using the Chord generator and the raw data.
@@ -129,110 +144,149 @@ export default {
      * Updates nodesGroup
      */
     updateNodesGroup: function () {
-      // Update the groups (add new, remove old) for each datum
-      // For each new group, add to it a path, a title, and a group element (for ticks)
-      this.nodesGroup
+      // The update selection
+      const nodes = this.nodesGroup
         .selectChildren("g")
-        .data(this.generatedChords.groups)
-        .join((enter) => {
-          const newGroup = enter.append("g");
-          newGroup.append("path");
-          newGroup.append("title");
-          newGroup.append("g");
-        });
+        .data(this.generatedChords.groups);
 
-      // Selects the nodes
-      const updatedNodes = this.nodesGroup.selectChildren("g");
+      // Removing the exit selection
+      nodes.exit().remove();
+
+      // Appending to the enter selection
+      const newNodes = nodes.enter().append("g");
+      newNodes.append("path");
+      newNodes.append("title");
+      newNodes.append("g");
+
+      // Merging new and old nodes
+      const allNodes = newNodes.merge(nodes);
 
       // Update the paths
-      updatedNodes
+      allNodes
         .select("path")
         .attr("fill", (d) => this.colorScale(this.nodes[d.index]))
         .attr("d", (d) => this.arc(d));
 
       // Update the title
-      updatedNodes.select("title").text((d) => d.value);
+      allNodes.select("title").text((d) => d.value);
 
       // Update the ticks group
       // a tick group is a group element that contains ticks
       // Each tick is a group element that has a line and a text
-      updatedNodes
-        .select("g")
-        .selectAll("g")
-        .data((d) => this.ticks(d)) // {value, angle:<angle>}
-        .join((enter) => {
-          const newTickGroup = enter.append("g");
-          newTickGroup.append("line");
-          newTickGroup.append("text");
+      const ticks = allNodes
+        .select("g") // tick groups
+        .selectAll("g") // ticks
+        .data((d, i) => {
+          console.log(`Tick ${i}'s data: `, d);
+          console.log(`Tick ${i}'s new data: `, this.ticks(d));
+          return this.ticks(d); // {value, angle:<angle>}
         });
 
-      // Selecting the ticksGroups
-      const ticksGroups = updatedNodes.select("g").selectChildren("g");
+      ticks.exit().remove();
+
+      const newTicks = ticks.enter().append("g");
+      newTicks.append("line");
+      newTicks.append("text");
+
+      const allTicks = newTicks.merge(ticks);
 
       // Updating the ticks' postion, line and text
-      ticksGroups.attr(
-        "transform",
-        (d) =>
-          `rotate(${(d.angle * 180) / Math.PI - 90}) translate(${
-            this.outerRadius
-          },0)`
-      );
-
-      ticksGroups
-        .selectAll("line")
-        .attr("stroke", "currentColor")
-        .attr("x2", 6);
-      ticksGroups
+      allTicks.attr("transform", (d) => {
+        console.log(d);
+        return `rotate(${(d.angle * 180) / Math.PI - 90}) translate(${
+          this.outerRadius
+        },0)`;
+      });
+      // Updating the lines
+      allTicks.selectAll("line").attr("stroke", "currentColor").attr("x2", 6);
+      // Updating the text
+      allTicks
         .selectAll("text")
         .attr("x", 8)
         .attr("dy", "0.35em")
-        .attr("transform", (d) =>
-          d.angle > Math.PI ? "rotate(180) translate(-16)" : null
-        )
+        .attr("transform", (d) => {
+          if (d.angle > Math.PI) {
+            return "rotate(180) translate(-16)";
+          } else {
+            return null;
+          }
+        })
         .attr("text-anchor", (d) => (d.angle > Math.PI ? "end" : null))
         .text((d) => d.value);
 
-      // Updates the text of the first tick
-      updatedNodes.select("text").attr("font-weight", "bold").text((d, i, n) => {
-        return n[i].getAttribute("text-anchor") === "end"
-          ? `↑ ${this.nodes[d.index]}`
-          : `${this.nodes[d.index]} ↓`;
+      // Hack to not change the data bound to the text element when using the select
+      const firstTicks = allNodes
+        .selectAll("text")
+        .filter((d) => d.value === 0);
+
+      firstTicks.attr("font-weight", "bold").text((d, i, n) => {
+        console.log(d);
+        if (n[i].getAttribute("text-anchor") === "end") {
+          return `↑ ${this.nodes[d.index]}`;
+        } else {
+          return `${this.nodes[d.index]} ↓`;
+        }
       });
     },
+
     /**
-     * Updates linksGroup
+     * Updates linksGroup based on the new data
      */
     updateLinksGroup: function () {
-      // Updates the links (add new, remove old) for the new data
-      // For each new link, add an empty path element to it
-      this.linksGroup
+      // Joining data to get the update selection
+      const links = this.linksGroup
         .selectAll("path")
-        .data(this.generatedChords)
-        .join((enter) => enter.append("path").append("title"));
+        .data(this.generatedChords);
 
-      const links = this.linksGroup.selectAll("path");
+      // Removing the exit selection
+      links.exit().remove();
 
-      // Updating the link's paths
-      links
+      // Appending new paths to the enter selection
+      const newLinks = links.enter().append("path");
+
+      // Mergeing the old and new
+      const allLinks = newLinks.merge(links);
+
+      // Updating the link's path attributes
+      allLinks
         .style("mix-blend-mode", "multiply")
         .attr("fill", (d) => this.colorScale(this.nodes[d.source.index]))
         .attr("d", this.ribbon);
 
-      // Updating the link's title
-      links
-        .selectAll("title")
-        .text(
+      // Appending titles to the new links
+      const newTitles = newLinks.append("title");
+
+      // Mereging the old and new titles
+      const allTitles = newTitles.merge(links.select("title"));
+
+      // Updating the text of the titles
+      if (this.diagramType === "directed") {
+        allTitles.text(
           (d) =>
-            `${d.source.value} ${this.nodes[d.source.index]} -> ${
-              this.nodes[d.target.index]
-            }\n${d.target.value} ${this.nodes[d.target.index]} -> ${
-              this.nodes[d.source.index]
+            `${this.nodes[d.source.index]} → ${this.nodes[d.target.index]} ${
+              d.source.value
             }`
         );
+      } else {
+        allTitles.text(
+          (d) =>
+            `${d.source.value} ${this.nodes[d.source.index]} → ${
+              this.nodes[d.target.index]
+            }${
+              d.source.index === d.target.index
+                ? ""
+                : `\n${d.target.value} ${this.nodes[d.target.index]} → ${
+                    this.nodes[d.source.index]
+                  }`
+            }`
+        );
+      }
+
+      links.exit().remove();
     },
 
     /** 
-    Returns {value, angle:<angle>}
+    Returns {index, value, angle:<angle>}
     value ranges from 0 to the max value of the group
    angle is the position of the tick
     */
@@ -240,9 +294,14 @@ export default {
       const startAngle = group.startAngle;
       const endAngle = group.endAngle;
       const value = group.value;
-      const k = (endAngle - startAngle) / value; // (arc degrees)/group value = tick position/angle?
+      let k = null;
+      if (value === 0) {
+        k = 0;
+      } else {
+        k = (endAngle - startAngle) / value; // (arc degrees)/group value = tick position/angle?}
+      }
       return d3.range(0, value, this.tickStep).map((value) => {
-        return { value, angle: value * k + startAngle };
+        return { index: group.index, value, angle: value * k + startAngle };
       });
     },
   },
