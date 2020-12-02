@@ -61,6 +61,7 @@
         :min="min"
         :max="max"
         v-model="sliderPosition"
+        @change="onDraw()"
       />
       <span id="plus-button">
         <button @click="onSliderInc">+</button>
@@ -72,7 +73,7 @@
       <span id="slider-disc"> Variants: {{ variantNums }}</span>
     </div>
     <div id="tabs">
-      <button v-for="tab in tabs" :key="tab" @click="currentTab = tab">
+      <button v-for="tab in tabs" :key="tab" :value="tab" @click="onTabChange">
         {{ tab }}
       </button>
       <keep-alive>
@@ -114,6 +115,23 @@ export default {
       sankeyData: "",
       // Chord Data
       chordData: "",
+      // Last parameters
+      lastParameters: {
+        Sankey: {
+          selectedFileNameToDraw: "",
+          selectedAttr: "",
+          selectedOp: "",
+          selectedAgg: "",
+          sliderPosition: 0,
+        },
+        Chord: {
+          selectedFileNameToDraw: "",
+          selectedAttr: "",
+          selectedOp: "",
+          selectedAgg: "",
+          sliderPosition: 0,
+        },
+      },
     };
   },
 
@@ -163,24 +181,37 @@ export default {
       }
     },
   },
-  watch: {
-    sliderPosition: function () {
-      this.onDraw();
-    },
-  },
+  // watch: {
+  //   sliderPosition: function () {
+  //     this.onDraw();
+  //   },
+  // },
   methods: {
+    onTabChange: function (e) {
+      const tab = e.target.value;
+      this.currentTab = tab;
+      this.selectedFileNameToDraw = this.lastParameters[
+        tab
+      ].selectedFileNameToDraw;
+      this.selectedAttr = this.lastParameters[tab].selectedAttr;
+      this.selectedOp = this.lastParameters[tab].selectedOp;
+      this.selectedAgg = this.lastParameters[tab].selectedAgg;
+      this.sliderPosition = this.lastParameters[tab].sliderPosition;
+    },
     onFileChange: function () {
       this.sliderPosition = 0;
     },
     onSliderInc: function () {
       if (this.sliderPosition < this.max && this.selectedFileToDraw != null) {
         this.sliderPosition++;
+        this.onDraw();
       }
     },
 
     onSliderDec: function () {
       if (this.sliderPosition > this.min && this.selectedFileToDraw != null) {
         this.sliderPosition--;
+        this.onDraw();
       }
     },
     onFileSelected: function (event) {
@@ -203,6 +234,7 @@ export default {
 
     onDraw: function () {
       if (this.noEmptyParam) {
+        // Payload
         const payload = new FormData();
         payload.append(
           "fileName",
@@ -215,12 +247,22 @@ export default {
         payload.append("operation", this.selectedOp);
         payload.append("aggregationFunc", this.selectedAgg);
         if (this.currentTabComponent === "sankey") {
+          this.lastParameters.Sankey.selectedFileNameToDraw = this.selectedFileNameToDraw;
+          this.lastParameters.Sankey.selectedAttr = this.selectedAttr;
+          this.lastParameters.Sankey.selectedOp = this.selectedOp;
+          this.lastParameters.Sankey.selectedAgg = this.selectedAgg;
+          this.lastParameters.Sankey.sliderPosition = this.sliderPosition;
           axios
             .post("http://localhost:8080/createSankey", payload)
             .then((res) => {
               this.sankeyData = res.data;
             });
         } else if (this.currentTabComponent === "chord") {
+          this.lastParameters.Chord.selectedFileNameToDraw = this.selectedFileNameToDraw;
+          this.lastParameters.Chord.selectedAttr = this.selectedAttr;
+          this.lastParameters.Chord.selectedOp = this.selectedOp;
+          this.lastParameters.Chord.selectedAgg = this.selectedAgg;
+          this.lastParameters.Chord.sliderPosition = this.sliderPosition;
           axios
             .post("http://localhost:8080/createChord", payload)
             .then((res) => {
