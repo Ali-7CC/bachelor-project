@@ -6,13 +6,13 @@
       <button v-on:click="onUpload">Upload</button>
     </div>
     <div id="draw-container">
-      <select v-model="selectedFileDraw">
-        <option value="null">Select a file</option>
+      <select v-on:change="onFileChange" v-model="selectedFileNameToDraw">
+        <option value="">Select a file</option>
         <option v-for="file in this.files" v-bind:key="file.name">
           {{ file.name }}
         </option>
       </select>
-      <select v-model="selectedPercentage">
+      <!-- <select v-model="selectedPercentage">
         <option value="">Select a percentage</option>
         <template v-if="selectedFileDraw != null">
           <option
@@ -23,13 +23,12 @@
             {{ percentage }}
           </option>
         </template>
-      </select>
+      </select> -->
       <select v-model="selectedAttr">
         <option value="">Select an attribute</option>
-        <template v-if="selectedFileDraw != null">
+        <template v-if="selectedFileToDraw != null">
           <option
-            v-for="attr in files.find((f) => f.name === selectedFileDraw)
-              .attributes"
+            v-for="attr in selectedFileToDraw.attributes"
             v-bind:key="attr"
           >
             {{ attr }}
@@ -51,6 +50,27 @@
       </select>
       <button v-on:click="onDraw">Draw</button>
     </div>
+
+    <div id="slider-container">
+      <span id="minus-button">
+        <button @click="onSliderDec">-</button>
+      </span>
+      <input
+        type="range"
+        id="slider"
+        :min="min"
+        :max="max"
+        v-model="sliderPosition"
+      />
+      <span id="plus-button">
+        <button @click="onSliderInc">+</button>
+      </span>
+
+      <span id="slider-value">
+        Percentage: {{ parseFloat((selectedPercentage * 100).toFixed(2)) }}%
+      </span>
+      <span id="slider-disc"> Variants: {{ variantNums }}</span>
+    </div>
     <div id="tabs">
       <button v-for="tab in tabs" :key="tab" @click="currentTab = tab">
         {{ tab }}
@@ -62,14 +82,6 @@
         ></component>
       </keep-alive>
     </div>
-    <!-- <div id="nav">
-      <select v-model="selectedVis">
-        <option value="sankey" selected>Sankey</option>
-        <option value="chord">Chord</option>
-      </select>
-    </div>
-    <Sankey :sankey-data="sankeyData"></Sankey>
-    <Chord :chord-data="chordData"></Chord> -->
   </div>
 </template>
 
@@ -89,11 +101,12 @@ export default {
       selectedFileUpload: "",
       files: [],
       // Drawing parameters
-      selectedFileDraw: null,
-      selectedPercentage: "",
+      selectedFileNameToDraw: "",
+      // selectedPercentage: "",
       selectedAttr: "",
       selectedOp: "",
       selectedAgg: "",
+      sliderPosition: 0,
       // Tabs
       tabs: ["Sankey", "Chord"],
       currentTab: "Sankey",
@@ -105,9 +118,40 @@ export default {
   },
 
   computed: {
-    percentages: function () {
-      return [].sort;
+    noEmptyParam: function () {
+      return (
+        this.selectedFileNameToDraw != "" &&
+        this.selectedAttr != "" &&
+        this.selectedOp != "" &&
+        this.selectedAgg != ""
+      );
     },
+    selectedFileToDraw: function () {
+      return this.selectedFileNameToDraw === ""
+        ? null
+        : this.files.find((f) => f.name === this.selectedFileNameToDraw);
+    },
+    variantNums: function () {
+      return this.selectedFileToDraw === null
+        ? 0
+        : parseInt(this.sliderPosition) + 1;
+    },
+    min: function () {
+      return 0;
+    },
+
+    max: function () {
+      return this.selectedFileToDraw === null
+        ? 0
+        : this.selectedFileToDraw.percentages.length - 1;
+    },
+
+    selectedPercentage: function () {
+      return this.selectedFileToDraw === null
+        ? 0
+        : this.selectedFileToDraw.percentages[this.sliderPosition];
+    },
+
     currentTabComponent: function () {
       return this.currentTab.toLowerCase();
     },
@@ -119,8 +163,26 @@ export default {
       }
     },
   },
-
+  watch: {
+    sliderPosition: function () {
+      this.onDraw();
+    },
+  },
   methods: {
+    onFileChange: function () {
+      this.sliderPosition = 0;
+    },
+    onSliderInc: function () {
+      if (this.sliderPosition < this.max && this.selectedFileToDraw != null) {
+        this.sliderPosition++;
+      }
+    },
+
+    onSliderDec: function () {
+      if (this.sliderPosition > this.min && this.selectedFileToDraw != null) {
+        this.sliderPosition--;
+      }
+    },
     onFileSelected: function (event) {
       this.selectedFileUpload = event.target.files[0];
     },
@@ -140,27 +202,33 @@ export default {
     },
 
     onDraw: function () {
-      const payload = new FormData();
-      payload.append(
-        "fileName",
-        this.selectedFileDraw.split(".xes")[0] +
-          "_" +
-          this.selectedPercentage +
-          ".xes"
-      );
-      payload.append("attributeKey", this.selectedAttr);
-      payload.append("operation", this.selectedOp);
-      payload.append("aggregationFunc", this.selectedAgg);
-      if (this.currentTabComponent === "sankey") {
-        axios
-          .post("http://localhost:8080/createSankey", payload)
-          .then((res) => {
-            this.sankeyData = res.data;
-          });
-      } else if (this.currentTabComponent === "chord") {
-        axios.post("http://localhost:8080/createChord", payload).then((res) => {
-          this.chordData = res.data;
-        });
+      if (this.noEmptyParam) {
+        const payload = new FormData();
+        payload.append(
+          "fileName",
+          this.selectedFileNameToDraw.split(".xes")[0] +
+            "_" +
+            this.selectedPercentage +
+            ".xes"
+        );
+        payload.append("attributeKey", this.selectedAttr);
+        payload.append("operation", this.selectedOp);
+        payload.append("aggregationFunc", this.selectedAgg);
+        if (this.currentTabComponent === "sankey") {
+          axios
+            .post("http://localhost:8080/createSankey", payload)
+            .then((res) => {
+              this.sankeyData = res.data;
+            });
+        } else if (this.currentTabComponent === "chord") {
+          axios
+            .post("http://localhost:8080/createChord", payload)
+            .then((res) => {
+              this.chordData = res.data;
+            });
+        }
+      } else {
+        alert("Not all parameters have been selected");
       }
     },
   },
