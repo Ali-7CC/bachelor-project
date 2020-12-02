@@ -123,7 +123,6 @@ export default {
      * of ticksGroup, which holds a line element (for the tick) and a text element for the name
      */
     nodesGroup: function () {
-      console.log("nodes group computed");
       return this.svg
         .append("g")
         .attr("font-size", 16)
@@ -176,9 +175,7 @@ export default {
       const ticks = allNodes
         .select("g") // tick groups
         .selectAll("g") // ticks
-        .data((d, i) => {
-          console.log(`Tick ${i}'s data: `, d);
-          console.log(`Tick ${i}'s new data: `, this.ticks(d));
+        .data((d) => {
           return this.ticks(d); // {value, angle:<angle>}
         });
 
@@ -192,7 +189,6 @@ export default {
 
       // Updating the ticks' postion, line and text
       allTicks.attr("transform", (d) => {
-        console.log(d);
         return `rotate(${(d.angle * 180) / Math.PI - 90}) translate(${
           this.outerRadius
         },0)`;
@@ -220,7 +216,6 @@ export default {
         .filter((d) => d.value === 0);
 
       firstTicks.attr("font-weight", "bold").text((d, i, n) => {
-        console.log(d);
         if (n[i].getAttribute("text-anchor") === "end") {
           return `↑ ${this.nodes[d.index]}`;
         } else {
