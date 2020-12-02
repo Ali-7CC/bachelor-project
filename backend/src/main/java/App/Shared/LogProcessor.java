@@ -1,9 +1,15 @@
 package App.Shared;
 
+import org.apache.commons.logging.Log;
+import org.deckfour.xes.classification.XEventClassifier;
+import org.deckfour.xes.factory.XFactory;
+import org.deckfour.xes.factory.XFactoryBufferedImpl;
 import org.deckfour.xes.model.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Holds different methods to process an event log of type XLog
@@ -20,6 +26,90 @@ public class LogProcessor {
         }
         return validAttr;
     }
+
+
+
+    public static boolean sameTrace(XLog log, XTrace t1, XTrace t2){
+        if(t1.size() != t2.size()) return false;
+        XEventClassifier classifier = log.getClassifiers().get(0);
+        for (int i = 0; i < t1.size(); i++){
+            XEvent e1 = t1.get(i);
+            XEvent e2 = t2.get(i);
+            if (!classifier.sameEventClass(e1,e2)) return false;
+        }
+        return true;
+    }
+
+    public static VariantMap findVariants(XLog log){
+        VariantMap variants = new VariantMap(log);
+        for(XTrace trace: log){
+            variants.update(trace);
+        }
+        return variants;
+    }
+
+    public static XLog combineTraces(List<XTrace> traces){
+        XFactoryBufferedImpl xFactory = new XFactoryBufferedImpl();
+        XLog log = xFactory.createLog();
+        for(XTrace trace : traces){
+            log.add(trace);
+        }
+        return log;
+    }
+
+    public static HashMap<Double, XLog> combineVariants(List<Variant> variants){
+        XFactoryBufferedImpl xFactory = new XFactoryBufferedImpl();
+        XLog log = xFactory.createLog();
+        double percentage = 0.0;
+        for(Variant v : variants){
+            percentage += v.percentage;
+            for(XTrace trace : v.traces){
+                log.add(trace);
+            }
+        }
+
+        HashMap<Double, XLog> result = new HashMap<>();
+        result.put(percentage, log);
+        return result;
+/*        List<XTrace> traces = variants.stream().flatMap(v -> v.traces.stream()).collect(Collectors.toList());
+        return LogProcessor.combineTraces(traces);*/
+    }
+
+    public static HashMap<Double, XLog> createSubLogs(XLog originalLog, VariantMap variants){
+        HashMap<Double, XLog> result = new HashMap<>();
+        List<Variant> rankedVariants = variants.variants.values().stream().sorted(Comparator.comparingDouble(Variant::getPercentage).reversed())
+                .collect(Collectors.toList());
+        for(int i = 1; i <= rankedVariants.size(); i++){
+            List<Variant> subList = rankedVariants.subList(0,i);
+            HashMap<Double, XLog> subLog = LogProcessor.combineVariants(subList);
+            Double percentage = LogProcessor.round(subLog.keySet().iterator().next(),2 );
+            XLog log = subLog.values().iterator().next();
+            result.put(percentage, log);
+        }
+
+        return result;
+    }
+
+
+
+/*    public static HashMap<Double, XLog> createSubLogs(XLog originalLog, VariantMap variants){
+        int numOfTraces = originalLog.size();
+        XFactoryBufferedImpl xFactory = new XFactoryBufferedImpl();
+        HashMap<Double, XLog> subLogs = new HashMap<>();
+        for(Map.Entry<String, Variant> entry : variants.variants.entrySet()){
+            double percentage = entry.getValue().frequency / numOfTraces;
+            XTrace trace = entry.getValue().traces.get(0);
+            XLog log = xFactory.createLog();
+            log.add(trace);
+        }
+
+
+    }*/
+
+
+
+
+
 
     /**
      * Iterates through a trace and populates the App.Shared.RelationToValuesMap with entries in the form
@@ -148,6 +238,14 @@ public class LogProcessor {
 
         }
 
+    }
+
+    private static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(Double.toString(value));
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
 

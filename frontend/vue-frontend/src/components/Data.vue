@@ -12,6 +12,18 @@
           {{ file.name }}
         </option>
       </select>
+      <select v-model="selectedPercentage">
+        <option value="">Select a percentage</option>
+        <template v-if="selectedFileDraw != null">
+          <option
+            v-for="percentage in files.find((f) => f.name === selectedFileDraw)
+              .percentages"
+            v-bind:key="percentage"
+          >
+            {{ percentage }}
+          </option>
+        </template>
+      </select>
       <select v-model="selectedAttr">
         <option value="">Select an attribute</option>
         <template v-if="selectedFileDraw != null">
@@ -40,9 +52,14 @@
       <button v-on:click="onDraw">Draw</button>
     </div>
     <div id="tabs">
-      <button v-for="tab in tabs" :key="tab" @click="currentTab = tab">{{ tab }}</button>
+      <button v-for="tab in tabs" :key="tab" @click="currentTab = tab">
+        {{ tab }}
+      </button>
       <keep-alive>
-        <component :is="currentTabComponent" :raw-data="currentProps"></component>
+        <component
+          :is="currentTabComponent"
+          :raw-data="currentProps"
+        ></component>
       </keep-alive>
     </div>
     <!-- <div id="nav">
@@ -73,12 +90,13 @@ export default {
       files: [],
       // Drawing parameters
       selectedFileDraw: null,
+      selectedPercentage: "",
       selectedAttr: "",
       selectedOp: "",
       selectedAgg: "",
       // Tabs
-      tabs : ["Sankey", "Chord"],
-      currentTab : "Sankey",
+      tabs: ["Sankey", "Chord"],
+      currentTab: "Sankey",
       // Sankey data
       sankeyData: "",
       // Chord Data
@@ -86,13 +104,20 @@ export default {
     };
   },
 
-  computed : {
-    currentTabComponent : function(){
+  computed: {
+    percentages: function () {
+      return [].sort;
+    },
+    currentTabComponent: function () {
       return this.currentTab.toLowerCase();
     },
-    currentProps : function(){
-      if (this.currentTabComponent === "sankey") {return this.sankeyData} else {return this.chordData}
-    }
+    currentProps: function () {
+      if (this.currentTabComponent === "sankey") {
+        return this.sankeyData;
+      } else {
+        return this.chordData;
+      }
+    },
   },
 
   methods: {
@@ -107,6 +132,7 @@ export default {
         const newFile = {
           name: this.selectedFileUpload.name,
           attributes: res.data.validAttributes,
+          percentages: res.data.percentages,
         };
         this.files.push(newFile);
         this.selectedFileUpload = null;
@@ -115,7 +141,13 @@ export default {
 
     onDraw: function () {
       const payload = new FormData();
-      payload.append("fileName", this.selectedFileDraw);
+      payload.append(
+        "fileName",
+        this.selectedFileDraw.split(".xes")[0] +
+          "_" +
+          this.selectedPercentage +
+          ".xes"
+      );
       payload.append("attributeKey", this.selectedAttr);
       payload.append("operation", this.selectedOp);
       payload.append("aggregationFunc", this.selectedAgg);

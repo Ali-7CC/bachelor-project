@@ -3,13 +3,12 @@ package App.upload;
 
 import org.deckfour.xes.in.XesXmlParser;
 import org.deckfour.xes.model.XLog;
+import org.deckfour.xes.out.XesXmlSerializer;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,13 +23,13 @@ public class FileUploadService {
     private Path path = Paths.get("src/main/uploads");
 
 
-    public void storeFile(MultipartFile file) throws IOException {
+    public void storeFile(MultipartFile file, String saveAs) throws IOException {
         // Check if file is empty (could break dir otherwise)
         if (file.isEmpty()) {
             throw new EmptyFileException("The uploaded file: " + file.getOriginalFilename() + " is empty.");
         }
         // Create a path for the new file
-        Path destinationPath = this.path.resolve(Paths.get(file.getOriginalFilename()))
+        Path destinationPath = this.path.resolve(Paths.get(saveAs))
                 .normalize().toAbsolutePath();
         // Saving the MultipartFile using a try-with-resources statement
         try (InputStream inputStream = file.getInputStream()) {
@@ -40,6 +39,44 @@ public class FileUploadService {
             throw e;
         }
     }
+
+
+    public void storeFile(File file, String saveAs) throws IOException {
+        // Check if file is empty (could break dir otherwise)
+        if (file.length() == 0) {
+            throw new EmptyFileException("The uploaded file: " + file.getName() + " is empty.");
+        }
+
+        // Create a path for the new file
+        Path destinationPath = this.path.resolve(Paths.get(saveAs))
+                .normalize().toAbsolutePath();
+
+        InputStream fileInputStream = new FileInputStream(file);
+        try (InputStream inputStream = fileInputStream) {
+            Files.copy(inputStream, destinationPath,
+                    StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
+    public void storeXLog(XLog log, String name){
+        File destinationPath = this.path.resolve(Paths.get(name))
+                .normalize().toAbsolutePath().toFile();
+        OutputStream outputStream = null;
+        try {
+            outputStream = new FileOutputStream(destinationPath);
+            XesXmlSerializer serializer = new XesXmlSerializer();
+            serializer.serialize(log, outputStream);
+        } catch (FileNotFoundException e) {
+           e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
 
 
     public File loadFile(String fileName) {

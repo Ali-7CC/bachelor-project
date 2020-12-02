@@ -34,6 +34,14 @@
             <systemPath>${project.basedir}/src/lib/OpenXES-20181205.jar</systemPath>
         </dependency>
 
+        <dependency>
+            <groupId>org.deckfour.spex</groupId>
+            <artifactId>spex</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/lib/Spex.jar</systemPath>
+        </dependency>
+
 
         <dependency>
             <groupId>com.google.guava</groupId>

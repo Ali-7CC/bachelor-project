@@ -1,6 +1,8 @@
 package App.upload;
 
 import App.Shared.LogProcessor;
+import App.Shared.Variant;
+import App.Shared.VariantMap;
 import org.deckfour.xes.model.XLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,8 +16,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -30,12 +35,26 @@ public class FileUploadController {
     @PostMapping("/upload")
     public ResponseEntity<HashMap<String, List<String>>> fileUpload(@RequestParam("file") MultipartFile file) {
         try {
-            storageService.storeFile(file);
+            // Storing the original file
+            storageService.storeFile(file, file.getOriginalFilename());
+            // Retrieving the original file
             File newFile = storageService.loadFile(file.getOriginalFilename());
+            // Getting the valid attribut4es
             XLog log = storageService.parseFile(newFile);
             List<String> validAttributes = LogProcessor.getValidAttributeKeys(log);
             HashMap<String, List<String>> response = new HashMap<>();
             response.put("validAttributes", validAttributes);
+            VariantMap variants = LogProcessor.findVariants(log);
+            HashMap<Double, XLog> sublogs = LogProcessor.createSubLogs(log, variants);
+            List<Double> percentages = new ArrayList<>();
+            for(Map.Entry<Double, XLog> entry : sublogs.entrySet()){
+                XLog sublog = entry.getValue();
+                double percentage = entry.getKey();
+                String name = file.getOriginalFilename().split(".xes")[0] + "_" + percentage + ".xes";
+                storageService.storeXLog(sublog, name);
+                percentages.add(percentage);
+            }
+            response.put("percentages", percentages.stream().sorted().map(d -> String.valueOf(d)).collect(Collectors.toList()));
             return ResponseEntity.ok(response);
         } catch (EmptyFileException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
