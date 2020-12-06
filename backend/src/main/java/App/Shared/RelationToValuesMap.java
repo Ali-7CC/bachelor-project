@@ -103,7 +103,7 @@ public class RelationToValuesMap {
         // Iterating through entries of this.map
         for (Map.Entry<Relation, List<Double>> entry : this.map.entrySet()) {
             // Populating the result HashMap with the relation and its average value
-            result.put(entry.getKey(), entry.getValue().stream().mapToDouble(a -> a).average().orElse(Double.NaN));
+            result.put(entry.getKey(), LogProcessor.round(entry.getValue().stream().mapToDouble(a -> a).average().orElse(Double.NaN), 2));
         }
 
         return result;
