@@ -2,28 +2,22 @@
   <div>
     <h1>Process Data Visualization</h1>
     <div id="upload-container">
-      <input type="file" accept=".xes" v-on:change="onFileSelected" />
-      <button v-on:click="onUpload">Upload</button>
+      <b-form-file
+        class="w-75"
+        size="sm"
+        type="file"
+        accept=".xes"
+        v-on:change="onFileSelected"
+      />
+      <b-button v-on:click="onUpload">Upload</b-button>
     </div>
     <div id="draw-container">
-      <select v-on:change="onFileChange" v-model="selectedFileNameToDraw">
-        <option value="">Select a file</option>
-        <option v-for="file in this.files" v-bind:key="file.name">
+      <b-dropdown v-on:change="onFileChange" v-model="selectedFileNameToDraw">
+        <b-dropdown-item v-for="file in this.files" v-bind:key="file.name">
+          <b-dropdown-item value="">Select a file</b-dropdown-item>
           {{ file.name }}
-        </option>
-      </select>
-      <!-- <select v-model="selectedPercentage">
-        <option value="">Select a percentage</option>
-        <template v-if="selectedFileDraw != null">
-          <option
-            v-for="percentage in files.find((f) => f.name === selectedFileDraw)
-              .percentages"
-            v-bind:key="percentage"
-          >
-            {{ percentage }}
-          </option>
-        </template>
-      </select> -->
+        </b-dropdown-item>
+      </b-dropdown>
       <select v-model="selectedAttr">
         <option value="">Select an attribute</option>
         <template v-if="selectedFileToDraw != null">
