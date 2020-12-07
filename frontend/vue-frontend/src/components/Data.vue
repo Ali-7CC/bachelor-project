@@ -284,6 +284,9 @@ export default {
   box-sizing: border-box;
   font-family: "Merriweather Sans", sans-serif;
 }
+button:focus {
+  outline: 0;
+}
 
 #root {
   display: flex;
