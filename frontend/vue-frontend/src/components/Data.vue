@@ -1,81 +1,80 @@
 <template>
-  <div>
-    <h1>Process Data Visualization</h1>
-    <div id="upload-container">
-      <input type="file" accept=".xes" v-on:change="onFileSelected" />
-      <button v-on:click="onUpload">Upload</button>
-    </div>
-    <div id="draw-container">
-      <select v-on:change="onFileChange" v-model="selectedFileNameToDraw">
-        <option value="">Select a file</option>
-        <option v-for="file in this.files" v-bind:key="file.name">
-          {{ file.name }}
-        </option>
-      </select>
-      <!-- <select v-model="selectedPercentage">
-        <option value="">Select a percentage</option>
-        <template v-if="selectedFileDraw != null">
-          <option
-            v-for="percentage in files.find((f) => f.name === selectedFileDraw)
-              .percentages"
-            v-bind:key="percentage"
-          >
-            {{ percentage }}
+  <div id="root">
+    <div id="options-container">
+      <h1>Process Data Visualization</h1>
+      <div id="upload-container">
+        <input type="file" accept=".xes" v-on:change="onFileSelected" />
+        <button id="upload-button" v-on:click="onUpload">Upload</button>
+      </div>
+      <div id="draw-container">
+        <select v-on:change="onFileChange" v-model="selectedFileNameToDraw">
+          <option value="">Select a file</option>
+          <option v-for="file in this.files" v-bind:key="file.name">
+            {{ file.name }}
           </option>
-        </template>
-      </select> -->
-      <select v-model="selectedAttr">
-        <option value="">Select an attribute</option>
-        <template v-if="selectedFileToDraw != null">
-          <option
-            v-for="attr in selectedFileToDraw.attributes"
-            v-bind:key="attr"
-          >
-            {{ attr }}
-          </option>
-        </template>
-      </select>
-      <select v-model="selectedOp">
-        <option value="">Select an operation</option>
-        <option value="COUNT">Count</option>
-        <option value="SUM">Sum</option>
-        <option value="DIFF">Difference</option>
-      </select>
-      <select v-model="selectedAgg">
-        <option value="">Select an aggregator</option>
-        <option value="SUM">Sum</option>
-        <option value="MAX">Max</option>
-        <option value="MIN">Min</option>
-        <option value="AVG">Average</option>
-      </select>
-      <button v-on:click="onDraw">Draw</button>
+        </select>
+        <select v-model="selectedAttr">
+          <option value="">Select an attribute</option>
+          <template v-if="selectedFileToDraw != null">
+            <option
+              v-for="attr in selectedFileToDraw.attributes"
+              v-bind:key="attr"
+            >
+              {{ attr }}
+            </option>
+          </template>
+        </select>
+        <select v-model="selectedOp">
+          <option value="">Select an operation</option>
+          <option value="COUNT">Count</option>
+          <option value="SUM">Sum</option>
+          <option value="DIFF">Difference</option>
+        </select>
+        <select v-model="selectedAgg">
+          <option value="">Select an aggregator</option>
+          <option value="SUM">Sum</option>
+          <option value="MAX">Max</option>
+          <option value="MIN">Min</option>
+          <option value="AVG">Average</option>
+        </select>
+        <button v-on:click="onDraw">Draw</button>
+      </div>
+
+      <div id="slider-container">
+        <span id="minus-button">
+          <button @click="onSliderDec">-</button>
+        </span>
+        <input
+          type="range"
+          id="slider"
+          :min="min"
+          :max="max"
+          v-model="sliderPosition"
+          @change="onDraw()"
+        />
+        <span id="plus-button">
+          <button @click="onSliderInc">+</button>
+        </span>
+
+        <span id="slider-value">
+          Percentage: {{ parseFloat((selectedPercentage * 100).toFixed(2)) }}%
+        </span>
+        <span id="slider-disc"> Variants: {{ variantNums }}</span>
+      </div>
+      <div id="tabs">
+        <button
+          v-for="tab in tabs"
+          :key="tab"
+          :value="tab"
+          @click="onTabChange"
+          :class="{ selectedTabStyle: tab === currentTab }"
+        >
+          {{ tab }}
+        </button>
+      </div>
     </div>
 
-    <div id="slider-container">
-      <span id="minus-button">
-        <button @click="onSliderDec">-</button>
-      </span>
-      <input
-        type="range"
-        id="slider"
-        :min="min"
-        :max="max"
-        v-model="sliderPosition"
-        @change="onDraw()"
-      />
-      <span id="plus-button">
-        <button @click="onSliderInc">+</button>
-      </span>
-
-      <span id="slider-value">
-        Percentage: {{ parseFloat((selectedPercentage * 100).toFixed(2)) }}%
-      </span>
-      <span id="slider-disc"> Variants: {{ variantNums }}</span>
-    </div>
-    <div id="tabs">
-      <button v-for="tab in tabs" :key="tab" :value="tab" @click="onTabChange">
-        {{ tab }}
-      </button>
+    <div id="diagram-container">
       <keep-alive>
         <component
           :is="currentTabComponent"
@@ -278,4 +277,79 @@ export default {
 </script>
 
 <style scoped>
+@import url("https://fonts.googleapis.com/css2?family=Merriweather+Sans&family=Poppins:wght@500&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Merriweather Sans", sans-serif;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+#diagram-container {
+  flex: 1;
+}
+
+h1 {
+  margin: 10px;
+}
+#upload-container {
+  margin: 10px 10px;
+}
+#upload-button {
+  padding: 0px 15px;
+}
+
+#draw-container {
+  margin: 10px 10px;
+}
+
+#draw-container select {
+  padding: 2px 15px;
+  margin-right: 10px;
+}
+
+#draw-container button {
+  padding: 2px 15px;
+}
+
+#slider-container {
+  margin: 10px 10px;
+}
+
+#slider-container button {
+  padding: 2px 4px;
+}
+
+#slider-container input {
+  margin: 0px 10px;
+}
+
+#tabs {
+  margin: 25px 10px 0px 10px;
+}
+.selectedTabStyle {
+  background-color: #b8ababbf;
+}
+
+#tabs button {
+  border: 1px solid #ccc;
+  padding: 5px 30px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+#tabs button:hover {
+  background: #b8ababbf;
+}
+
+#diagram-container {
+  margin: 0px 10px;
+  border: 3px solid rgb(177, 165, 165);
+}
 </style>>

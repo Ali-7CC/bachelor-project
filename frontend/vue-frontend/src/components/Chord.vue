@@ -17,8 +17,8 @@ export default {
   props: ["rawData"],
   data() {
     return {
-      width: 1900,
-      height: 1000,
+      width: 1600,
+      height: 900,
       diagramType: "directed",
       // Raw data from parent component
       matrix: [],
@@ -62,7 +62,7 @@ export default {
      * Defines the color scale with the range schemeCategory10
      */
     colorScale: function () {
-      return d3.scaleOrdinal(d3.schemeCategory10);
+      return d3.scaleOrdinal(d3.schemeTableau10);
     },
     /**
      * Draws the diagram's nodes
@@ -308,4 +308,23 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+h1 {
+  margin: 5px 20px;
+  font-size: 25px;
+}
+
+#view-options select {
+  margin-left: 20px;
+}
+
+#chord-container {
+  margin: 5px 5px 0 20px;
+}
+</style>

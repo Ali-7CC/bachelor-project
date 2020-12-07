@@ -31,7 +31,7 @@ export default {
   props: ["rawData"],
   data() {
     return {
-      WIDTH: 900,
+      WIDTH: 1200,
       HEIGHT: 400,
       alignment: "sankeyLeft",
       isGrouped: "false",
@@ -56,7 +56,7 @@ export default {
      * Defines the color scale with the range schemeCategory10
      */
     colorScale: function () {
-      return d3.scaleOrdinal(d3.schemeCategory10);
+      return d3.scaleOrdinal(d3.schemeTableau10);
     },
 
     /**
@@ -279,7 +279,7 @@ export default {
 
 h1 {
   margin: 5px 20px;
-  font-size: 30px;
+  font-size: 25px;
 }
 
 #view-options select {

@@ -10,10 +10,14 @@ import Data from "./components/Data.vue";
 export default {
   name: "App",
   components: {
-    Data
+    Data,
   },
 };
 </script>
 
-<style>
+<style >
+
+body {
+  margin: 0px;
+}
 </style>
