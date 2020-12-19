@@ -72,7 +72,9 @@
                 <version>3.2.0</version>
                 <configuration>
                     <archive>
-                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                        <addClasspath>true</addClasspath>
+                        <classpathPrefix>lib/</classpathPrefix>
+                        <mainClass>App.App</mainClass>
                     </archive>
                 </configuration>
             </plugin>
