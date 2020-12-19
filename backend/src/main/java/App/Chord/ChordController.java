@@ -27,7 +27,7 @@ public class ChordController {
         this.chordGenerator = chordGenerator;
     }
 
-    @CrossOrigin(origins = "http://localhost:8081")
+    @CrossOrigin
     @PostMapping("/createChord")
     public ResponseEntity<String> createChord(@RequestParam("fileName") String fileName,
                                               @RequestParam("attributeKey") String attributeKey,

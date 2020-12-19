@@ -24,7 +24,7 @@ public class SankeyController {
         this.sankeyGenerator = sankeyGenerator;
     }
 
-    @CrossOrigin(origins = "http://localhost:8081")
+    @CrossOrigin
     @PostMapping("/createSankey")
     public ResponseEntity<String> createSankey(@RequestParam("fileName") String fileName,
                                                @RequestParam("attributeKey") String attributeKey,

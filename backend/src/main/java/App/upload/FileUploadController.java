@@ -31,7 +31,7 @@ public class FileUploadController {
     public FileUploadController(FileUploadService storageService) {
         this.storageService = storageService;
     }
-    @CrossOrigin(origins = "http://localhost:8081")
+    @CrossOrigin
     @PostMapping("/upload")
     public ResponseEntity<HashMap<String, List<String>>> fileUpload(@RequestParam("file") MultipartFile file) {
         try {
@@ -39,7 +39,7 @@ public class FileUploadController {
             storageService.storeFile(file, file.getOriginalFilename());
             // Retrieving the original file
             File newFile = storageService.loadFile(file.getOriginalFilename());
-            // Getting the valid attribut4es
+            // Getting the valid attributes
             XLog log = storageService.parseFile(newFile);
             List<String> validAttributes = LogProcessor.getValidAttributeKeys(log);
             HashMap<String, List<String>> response = new HashMap<>();
