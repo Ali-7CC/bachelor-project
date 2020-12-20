@@ -1,7 +1,6 @@
 package App.upload;
 
 import App.Shared.LogProcessor;
-import App.Shared.Variant;
 import App.Shared.VariantMap;
 import org.deckfour.xes.model.XLog;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +23,11 @@ import java.util.stream.Collectors;
 
 
 @RestController
-public class FileUploadController {
-    private FileUploadService storageService;
+public class FileStorageController {
+    private FileStorageService storageService;
 
     @Autowired
-    public FileUploadController(FileUploadService storageService) {
+    public FileStorageController(FileStorageService storageService) {
         this.storageService = storageService;
     }
     @CrossOrigin

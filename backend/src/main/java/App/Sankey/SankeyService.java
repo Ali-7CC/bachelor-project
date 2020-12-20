@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  */
 
 @Service
-public class SankeyGenerator {
+public class SankeyService {
 
     public List<SankeyModel> createSankey(XLog log, String attributeKey, String operator, String aggregationFunc){
         SankeyModel ungroupedSankey = createSankey(log, attributeKey, operator, aggregationFunc, false);

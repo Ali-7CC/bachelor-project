@@ -19,7 +19,7 @@ import java.util.List;
  * Handles file uploading
  */
 @Service
-public class FileUploadService {
+public class FileStorageService {
     private Path path = Paths.get("src/main/uploads");
 
 
