@@ -1,8 +1,6 @@
 package App.Chord;
 
-import App.Sankey.SankeyGenerator;
-import App.Sankey.SankeyModel;
-import App.upload.FileUploadService;
+import App.upload.FileStorageService;
 import org.deckfour.xes.model.XLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,16 +11,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
-import java.util.List;
 
 @RestController
 public class ChordController {
-    private final FileUploadService storageService;
+    private final FileStorageService storageService;
     private final ChordGenerator chordGenerator;
 
 
     @Autowired
-    public ChordController(FileUploadService storageService, ChordGenerator chordGenerator) {
+    public ChordController(FileStorageService storageService, ChordGenerator chordGenerator) {
         this.storageService = storageService;
         this.chordGenerator = chordGenerator;
     }

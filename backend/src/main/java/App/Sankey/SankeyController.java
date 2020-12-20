@@ -1,6 +1,6 @@
 package App.Sankey;
 
-import App.upload.FileUploadService;
+import App.upload.FileStorageService;
 import org.deckfour.xes.model.XLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,13 +15,13 @@ import java.util.List;
 
 @RestController
 public class SankeyController {
-    private final FileUploadService storageService;
-    private final SankeyGenerator sankeyGenerator;
+    private final FileStorageService storageService;
+    private final SankeyService sankeyService;
 
     @Autowired
-    public SankeyController(FileUploadService storageService, SankeyGenerator sankeyGenerator) {
+    public SankeyController(FileStorageService storageService, SankeyService sankeyService) {
         this.storageService = storageService;
-        this.sankeyGenerator = sankeyGenerator;
+        this.sankeyService = sankeyService;
     }
 
     @CrossOrigin
@@ -33,7 +33,7 @@ public class SankeyController {
         try {
             File file = storageService.loadFile(fileName);
             XLog log = storageService.parseFile(file);
-            List<SankeyModel> sankeyModels = sankeyGenerator.createSankey(log, attributeKey, operator, aggregationFunc);
+            List<SankeyModel> sankeyModels = sankeyService.createSankey(log, attributeKey, operator, aggregationFunc);
             String body = "{\"ungroupedModel\" : " + sankeyModels.get(0).toJSONString() + " , \"groupedModel\" : "+ sankeyModels.get(1).toJSONString() + "}";
             return new ResponseEntity<>(body, HttpStatus.OK);
         } catch (Exception e) {

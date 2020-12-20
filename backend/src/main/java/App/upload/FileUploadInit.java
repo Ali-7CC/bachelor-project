@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class FileUploadInit implements CommandLineRunner {
-    private FileUploadService storageService;
+    private FileStorageService storageService;
 
     @Autowired
-    public FileUploadInit(FileUploadService storageService) {
+    public FileUploadInit(FileStorageService storageService) {
         this.storageService = storageService;
     }
 
