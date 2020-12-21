@@ -26,6 +26,7 @@ public class AttributeOperations {
         // date type
         else if ((attr1 instanceof XAttributeTimestamp) && (attr2 instanceof XAttributeTimestamp)) {
             result = ((XAttributeTimestamp) attr1).getValueMillis() + ((XAttributeTimestamp) attr2).getValueMillis();
+            result = (result/1000)/60;
         }
         return result;
     }
@@ -45,6 +46,8 @@ public class AttributeOperations {
         // date type
         else if ((attr1 instanceof XAttributeTimestamp) && (attr2 instanceof XAttributeTimestamp)) {
             result = ((XAttributeTimestamp) attr1).getValueMillis() - ((XAttributeTimestamp) attr2).getValueMillis();
+            result = (result/1000)/60;
+
         }
         return Math.abs(result);
     }

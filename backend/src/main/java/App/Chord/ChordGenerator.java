@@ -3,6 +3,8 @@ package App.Chord;
 import App.Shared.LogProcessor;
 import App.Shared.Relation;
 import App.Shared.RelationToValuesMap;
+import org.apache.juli.logging.Log;
+import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 import org.springframework.stereotype.Service;
@@ -21,9 +23,10 @@ public class ChordGenerator {
 
     public ChordModel createChord(XLog log, String attributeKey, String operator, String aggregationFunc) {
         RelationToValuesMap relationsToValues = new RelationToValuesMap(attributeKey, operator);
+        XEventClassifier classifier = LogProcessor.getClassifier(log);
         for (XTrace trace : log) {
             relationsToValues = LogProcessor.relationToValues(trace, attributeKey, operator,
-                    false, relationsToValues);
+                    false, relationsToValues, classifier);
         }
 
         HashMap<Relation, Double> links = relationsToValues.aggregate(aggregationFunc);
