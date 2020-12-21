@@ -1,5 +1,8 @@
 package App.Sankey;
 
+import App.Shared.LogProcessor;
+import org.deckfour.xes.classification.XEventClassifier;
+import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XTrace;
 
 import java.util.ArrayList;
@@ -29,7 +32,7 @@ public class TraceGroupsMap {
      * @param position The position of the activity
      * @return A String which either represents the group name or the trace name (if the activity has no group).
      */
-    public String makeGroupName(XTrace trace, String attrKey, int position) {
+    public String makeGroupName(XTrace trace, String attrKey, int position, XEventClassifier classifier) {
         // Initialize the groupName to be the trace name
         String groupName = trace.getAttributes().get("concept:name").toString();
         // Check whether 2 or more traces share their activities up to "position", if not return the trace name.
@@ -47,7 +50,9 @@ public class TraceGroupsMap {
                     groupNameList.add("_");
                     // Getting the sequence of the common activities and adding them to the name list
                     for (int i = 0; i <= position; i++) {
-                        groupNameList.add(traceGroup.traces.get(0).get(i).getAttributes().get(attrKey).toString());
+                        XEvent event = traceGroup.traces.get(0).get(i);
+                        String name = LogProcessor.makeNodeLabel(event, attrKey, classifier);
+                        groupNameList.add(name);
                     }
                     groupName = groupNameList.stream().collect(Collectors.joining());
                 }

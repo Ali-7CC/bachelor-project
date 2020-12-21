@@ -4,10 +4,9 @@ import App.Shared.AttributeOperations;
 import App.Shared.LogProcessor;
 import App.Shared.Relation;
 import App.Shared.RelationToValuesMap;
-import org.deckfour.xes.model.XAttribute;
-import org.deckfour.xes.model.XEvent;
-import org.deckfour.xes.model.XLog;
-import org.deckfour.xes.model.XTrace;
+import org.apache.juli.logging.Log;
+import org.deckfour.xes.classification.XEventClassifier;
+import org.deckfour.xes.model.*;
 import org.deckfour.xes.model.impl.XAttributeMapImpl;
 import org.deckfour.xes.model.impl.XLogImpl;
 import org.springframework.stereotype.Service;
@@ -35,16 +34,17 @@ public class SankeyService {
 
     public SankeyModel createSankey(XLog log, String attributeKey, String operator, String aggregationFunc, boolean grouping) {
         RelationToValuesMap relationsToValues = new RelationToValuesMap(attributeKey, operator);
+        XEventClassifier classifier = LogProcessor.getClassifier(log);
         if (grouping) {
-            TraceGroupsMap groups = findTraceGroups(log, attributeKey);
+            TraceGroupsMap groups = findTraceGroups(log, attributeKey, classifier);
             for (XTrace trace : log) {
-                relationsToValues = this.groupedRelationToValues(trace, attributeKey, operator, groups, relationsToValues);
+                relationsToValues = this.groupedRelationToValues(trace, attributeKey, operator, groups, relationsToValues,classifier);
             }
 
         } else {
             for (XTrace trace : log) {
                 relationsToValues = LogProcessor.relationToValues(trace, attributeKey, operator,
-                        true, relationsToValues);
+                        true, relationsToValues, classifier);
             }
         }
 
@@ -74,7 +74,7 @@ public class SankeyService {
 
 
     public RelationToValuesMap groupedRelationToValues(XTrace trace, String attrKey, String operator,
-                                                       TraceGroupsMap groups, RelationToValuesMap relationToValuesMap) {
+                                                       TraceGroupsMap groups, RelationToValuesMap relationToValuesMap, XEventClassifier classifier) {
         // If trace has 1 event only
         if (trace.size() <= 1) {
             if (!operator.equals("COUNT")) return relationToValuesMap;
@@ -86,8 +86,10 @@ public class SankeyService {
             relation.events.add(null);
 
             // Naming the source node based on the grouping
-            String sourceAttributeName = sourceAttribute.toString();
-            String sourceGroupName = groups.makeGroupName(trace,attrKey, 0);
+            String sourceAttributeName = LogProcessor.makeNodeLabel(sourceEvent, attrKey, classifier);
+
+
+            String sourceGroupName = groups.makeGroupName(trace,attrKey, 0, classifier);
             relation.eventNames.add(sourceAttributeName + "_0_" + "(" + sourceGroupName + ")");
 
             // Adding a target node
@@ -125,10 +127,12 @@ public class SankeyService {
                 relation.events.add(targetEvent);
 
                 // Naming the nodes based on the grouping
-                String sourceAttributeName = sourceAttribute.toString();
-                String targetAttributeName = targetAttribute.toString();
-                String sourceGroupName = groups.makeGroupName(trace, attrKey, i);
-                String targetGroupName = groups.makeGroupName(trace, attrKey, i + 1);
+                String sourceAttributeName = LogProcessor.makeNodeLabel(sourceEvent, attrKey, classifier);
+                String targetAttributeName = LogProcessor.makeNodeLabel(targetEvent, attrKey, classifier);
+
+
+                String sourceGroupName = groups.makeGroupName(trace, attrKey, i, classifier);
+                String targetGroupName = groups.makeGroupName(trace, attrKey, i + 1, classifier);
                 relation.eventNames.add(sourceAttributeName + "_" + (i) + "_" + "(" + sourceGroupName + ")");
                 relation.eventNames.add(targetAttributeName + "_" + (i + 1) + "_" + "(" + targetGroupName + ")");
 
@@ -192,7 +196,7 @@ public class SankeyService {
      * @return A TraceGroupMap that maps the index to which the traces share their first activities to
      * the list of App.Sankey.TraceGroup
      */
-    public TraceGroupsMap findTraceGroups(List<XTrace> log, String attrKey) {
+    public TraceGroupsMap findTraceGroups(List<XTrace> log, String attrKey, XEventClassifier classifier) {
         HashMap<Integer, List<TraceGroup>> groupsMap = new HashMap<>();
         List<TraceGroup> groupsMaster = new ArrayList<>();
         TraceGroup initialGroup = new TraceGroup();
@@ -202,7 +206,7 @@ public class SankeyService {
         while (!groupsMaster.isEmpty()) {
             List<TraceGroup> newMaster = new ArrayList<>();
             for (TraceGroup group : groupsMaster) {
-                List<TraceGroup> newGroups = groupBynthActivity(group, attrKey, position);
+                List<TraceGroup> newGroups = groupBynthActivity(group, attrKey, position, classifier);
                 for (TraceGroup newGroup : newGroups) {
                     if (newGroup.traces.size() > 1) {
                         // Updating the groupsMap with the new groups
@@ -240,7 +244,7 @@ public class SankeyService {
      * @return A list of App.Sankey.TraceGroup. Each App.Sankey.TraceGroup in that list that contains 2 or more traces share
      * the first n activities.
      */
-    public List<TraceGroup> groupBynthActivity(TraceGroup group, String attrKey, int n) {
+    public List<TraceGroup> groupBynthActivity(TraceGroup group, String attrKey, int n, XEventClassifier classifier) {
         // Initializing the list to be returned
         List<TraceGroup> traceGroups = new ArrayList<>();
         // Traces that are shorter or equal to n are immediately made into a new App.Sankey.TraceGroup and added to the
@@ -257,7 +261,7 @@ public class SankeyService {
         }
         // Grouping the longer traces
         List<List<XTrace>> groups = longGroups.traces.stream().collect(Collectors
-                .groupingBy(trace -> trace.get(n).getAttributes().get(attrKey)))
+                .groupingBy(trace -> LogProcessor.makeNodeLabel(trace.get(n), attrKey, classifier)))
                 .values().stream().collect(Collectors.toList());
 
         // Constructing the new trace groups that share their attribute up to index n.

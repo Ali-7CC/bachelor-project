@@ -1,14 +1,18 @@
 package App.Shared;
 
-import org.apache.commons.logging.Log;
+import org.deckfour.xes.classification.XEventAttributeClassifier;
 import org.deckfour.xes.classification.XEventClassifier;
-import org.deckfour.xes.factory.XFactory;
 import org.deckfour.xes.factory.XFactoryBufferedImpl;
+import org.deckfour.xes.info.XLogInfo;
+import org.deckfour.xes.info.XLogInfoFactory;
 import org.deckfour.xes.model.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -29,45 +33,100 @@ public class LogProcessor {
 
 
 
-    public static boolean sameTrace(XLog log, XTrace t1, XTrace t2){
-        if(t1.size() != t2.size()) return false;
+    public static String makeNodeLabel( XEvent event, String attrKey, XEventClassifier classifier){
+        XAttribute attr = event.getAttributes().get(attrKey);
+        if(attr instanceof XAttributeLiteral){
+            return attr.toString();
+        } else{
+            return classifier.getClassIdentity(event);
+        }
+    }
+
+    public static XEventClassifier getClassifier(XLog log) {
+        List<XEventClassifier> classifiers = log.getClassifiers();
+        // If there's only 1 classifier, return it
+        if (classifiers.size() == 1) {
+            return classifiers.get(0);
+        } else {
+            // Grouping classifiers based on the number of attributes they use
+            List<XEventClassifier> singleAttrClassifiers = new ArrayList<>();
+            List<XEventClassifier> multAttrClassifiers = new ArrayList<>();
+            for (XEventClassifier classifier : classifiers) {
+                if (classifier.getDefiningAttributeKeys().length == 1) {
+                    singleAttrClassifiers.add(classifier);
+                } else {
+                    multAttrClassifiers.add(classifier);
+                }
+            }
+
+            // Looping through the singles first
+            for (XEventClassifier classifier : singleAttrClassifiers) {
+                String attrKey = classifier.getDefiningAttributeKeys()[0];
+                if (attrKey.equals("concept:name") || attrKey.equals("Activity") || attrKey.equals("activity") || attrKey.equals("name")) {
+                    return classifier;
+                }
+
+            }
+
+            // Looping through the mults
+            for (XEventClassifier classifier : multAttrClassifiers) {
+                for (String key : classifier.getDefiningAttributeKeys()) {
+                    if (key.equals("concept:name") || key.equals("Activity") || key.equals("activity") || key.equals("name")) {
+                        return classifier;
+                    }
+                }
+            }
+
+            // Have looped through all classifeirs, and none of them have a concept or activity attribute
+            return classifiers.get(0);
+
+        }
+    }
+
+
+    public static boolean sameTrace(XLog log, XTrace t1, XTrace t2) {
+        if (t1.size() != t2.size()) return false;
         XEventClassifier classifier = log.getClassifiers().get(0);
-        for (int i = 0; i < t1.size(); i++){
+        for (int i = 0; i < t1.size(); i++) {
             XEvent e1 = t1.get(i);
             XEvent e2 = t2.get(i);
-            if (!classifier.sameEventClass(e1,e2)) return false;
+            if (!classifier.sameEventClass(e1, e2)) return false;
         }
         return true;
     }
 
-    public static VariantMap findVariants(XLog log){
+    public static VariantMap findVariants(XLog log) {
         VariantMap variants = new VariantMap(log);
-        for(XTrace trace: log){
+        for (XTrace trace : log) {
             variants.update(trace);
         }
         return variants;
     }
 
-    public static XLog combineTraces(List<XTrace> traces){
+    public static XLog combineTraces(List<XTrace> traces) {
         XFactoryBufferedImpl xFactory = new XFactoryBufferedImpl();
         XLog log = xFactory.createLog();
-        for(XTrace trace : traces){
+        for (XTrace trace : traces) {
             log.add(trace);
         }
         return log;
     }
 
-    public static HashMap<Double, XLog> combineVariants(List<Variant> variants){
+    public static HashMap<Double, XLog> combineVariants(List<Variant> variants, XLog originalLog) {
         XFactoryBufferedImpl xFactory = new XFactoryBufferedImpl();
         XLog log = xFactory.createLog();
         double percentage = 0.0;
-        for(Variant v : variants){
+        for (Variant v : variants) {
             percentage += v.percentage;
-            for(XTrace trace : v.traces){
+            for (XTrace trace : v.traces) {
                 log.add(trace);
             }
         }
 
+        List<XEventClassifier> classifiers = originalLog.getClassifiers();
+        for(XEventClassifier c : classifiers){
+            log.getClassifiers().add(c);
+        }
         HashMap<Double, XLog> result = new HashMap<>();
         result.put(percentage, log);
         return result;
@@ -75,14 +134,14 @@ public class LogProcessor {
         return LogProcessor.combineTraces(traces);*/
     }
 
-    public static HashMap<Double, XLog> createSubLogs(XLog originalLog, VariantMap variants){
+    public static HashMap<Double, XLog> createSubLogs(XLog originalLog, VariantMap variants) {
         HashMap<Double, XLog> result = new HashMap<>();
         List<Variant> rankedVariants = variants.variants.values().stream().sorted(Comparator.comparingDouble(Variant::getPercentage).reversed())
                 .collect(Collectors.toList());
-        for(int i = 1; i <= rankedVariants.size(); i++){
-            List<Variant> subList = rankedVariants.subList(0,i);
-            HashMap<Double, XLog> subLog = LogProcessor.combineVariants(subList);
-            Double percentage = LogProcessor.round(subLog.keySet().iterator().next(),2 );
+        for (int i = 1; i <= rankedVariants.size(); i++) {
+            List<Variant> subList = rankedVariants.subList(0, i);
+            HashMap<Double, XLog> subLog = LogProcessor.combineVariants(subList, originalLog);
+            Double percentage = LogProcessor.round(subLog.keySet().iterator().next(), 2);
             XLog log = subLog.values().iterator().next();
             result.put(percentage, log);
         }
@@ -107,10 +166,6 @@ public class LogProcessor {
     }*/
 
 
-
-
-
-
     /**
      * Iterates through a trace and populates the App.Shared.RelationToValuesMap with entries in the form
      * [attribute 1, attribute 2] --> [double 1, double 2,..] based on the chosen attribute and
@@ -125,7 +180,7 @@ public class LogProcessor {
      */
 
     public static RelationToValuesMap relationToValues(XTrace trace, String attrKey, String operator, boolean duplicates,
-                                                       RelationToValuesMap relationToValuesMap) {
+                                                       RelationToValuesMap relationToValuesMap, XEventClassifier classifier) {
         // If trace has 1 event only
         if (trace.size() <= 1) {
             if (!operator.equals("COUNT")) return relationToValuesMap;
@@ -137,12 +192,13 @@ public class LogProcessor {
             relation.events.add(null);
 
             // Naming the source node based on the given configuration
-            String sourceAttributeName = sourceAttribute.toString();
+            String sourceAttributeName = makeNodeLabel(sourceEvent, attrKey, classifier);
+
             if (duplicates) {
                 relation.eventNames.add(sourceAttributeName + "_0");
 
             } else {
-                relation.eventNames.add(sourceAttribute.toString());
+                relation.eventNames.add(sourceAttributeName);
             }
 
             relation.eventNames.add("End");
@@ -151,11 +207,11 @@ public class LogProcessor {
             // Adding the relation to the map
             if (relationToValuesMap.map.containsKey(relation)) {
                 List<Double> values = relationToValuesMap.map.get(relation);
-                values.add(1.0);
+                values.add(value);
                 relationToValuesMap.map.put(relation, values);
             } else {
                 List<Double> values = new ArrayList<>();
-                values.add(1.0);
+                values.add(value);
                 relationToValuesMap.map.put(relation, values);
             }
 
@@ -177,12 +233,15 @@ public class LogProcessor {
                 relation.events.add(targetEvent);
 
                 // Naming the nodes based on the given configuration
-                String sourceAttributeName = sourceAttribute.toString();
-                String targetAttributeName = targetAttribute.toString();
+
+                String sourceAttributeName = makeNodeLabel(sourceEvent, attrKey, classifier);
+                String targetAttributeName = makeNodeLabel(targetEvent, attrKey, classifier);
+
+
 
                 if (duplicates) {
-                    relation.eventNames.add(sourceAttribute.toString() + "_" + (i));
-                    relation.eventNames.add(targetAttribute.toString() + "_" + (i + 1));
+                    relation.eventNames.add(sourceAttributeName + "_" + (i));
+                    relation.eventNames.add(targetAttributeName + "_" + (i + 1));
                 } else {
                     relation.eventNames.add(sourceAttributeName);
                     relation.eventNames.add(targetAttributeName);
