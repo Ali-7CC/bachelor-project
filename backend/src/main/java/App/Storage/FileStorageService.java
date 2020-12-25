@@ -1,6 +1,8 @@
 package App.Storage;
 
 
+import App.Shared.LogProcessor;
+import App.Shared.VariantMap;
 import org.deckfour.xes.in.XesXmlParser;
 import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.out.XesXmlSerializer;
@@ -13,7 +15,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Handles file uploading
@@ -59,6 +65,35 @@ public class FileStorageService {
             throw e;
         }
     }
+
+
+    public FileMetadataModel processFile(String name){
+        // Retrieving the original file
+        File newFile = this.loadFile(name);
+        // Getting the valid attributes
+        XLog log = this.parseFile(newFile);
+        List<String> validAttributes = LogProcessor.getValidAttributeKeys(log);
+        // Creating sublogs
+        VariantMap variants = LogProcessor.findVariants(log);
+        HashMap<Double, XLog> sublogs = LogProcessor.createSubLogs(log, variants);
+        List<Double> percentages = new ArrayList<>();
+        for(Map.Entry<Double, XLog> entry : sublogs.entrySet()){
+            XLog sublog = entry.getValue();
+            double percentage = entry.getKey();
+            String fileName = name.split(".xes")[0] + "_" + percentage + ".xes";
+            this.storeXLog(sublog, fileName);
+            percentages.add(percentage);
+        }
+
+        List<String> stringPercentages = percentages.stream().sorted().map(d -> String.valueOf(d)).collect(Collectors.toList());
+
+        // Creating the model
+        FileMetadataModel metadata = new FileMetadataModel(validAttributes, stringPercentages);
+
+        return metadata;
+
+    }
+
 
     public void storeXLog(XLog log, String name){
         File destinationPath = this.path.resolve(Paths.get(name))
