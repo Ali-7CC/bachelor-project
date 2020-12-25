@@ -1,4 +1,4 @@
-package App.upload;
+package App.Storage;
 
 import App.Shared.LogProcessor;
 import App.Shared.VariantMap;

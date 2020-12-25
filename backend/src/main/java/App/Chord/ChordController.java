@@ -1,6 +1,6 @@
 package App.Chord;
 
-import App.upload.FileStorageService;
+import App.Storage.FileStorageService;
 import org.deckfour.xes.model.XLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

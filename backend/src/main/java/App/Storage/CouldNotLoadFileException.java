@@ -1,4 +1,4 @@
-package App.upload;
+package App.Storage;
 
 public class CouldNotLoadFileException extends RuntimeException {
     public CouldNotLoadFileException(String message) {
