@@ -39,6 +39,10 @@
         </select>
         <button v-on:click="onDraw">Draw</button>
       </div>
+      <div id="end">
+        <input type="checkbox" id="end" />
+        <label for="end"> Remove singular traces</label>
+      </div>
 
       <div id="slider-container">
         <span id="minus-button">
@@ -300,6 +304,10 @@ button:focus {
 
 h1 {
   margin: 10px;
+}
+
+#end {
+  margin-left: 5px;
 }
 #upload-container {
   margin: 10px 10px;
