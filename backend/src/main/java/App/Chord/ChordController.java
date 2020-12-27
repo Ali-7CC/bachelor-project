@@ -29,11 +29,12 @@ public class ChordController {
     public ResponseEntity<String> createChord(@RequestParam("fileName") String fileName,
                                               @RequestParam("attributeKey") String attributeKey,
                                               @RequestParam("operation") String operator,
-                                              @RequestParam("aggregationFunc") String aggregationFunc){
+                                              @RequestParam("aggregationFunc") String aggregationFunc,
+                                              @RequestParam("noEnd") boolean noEnd){
         try {
             File file = storageService.loadFile(fileName);
             XLog log = storageService.parseFile(file);
-            ChordModel chordModel = chordGenerator.createChord(log, attributeKey, operator, aggregationFunc);
+            ChordModel chordModel = chordGenerator.createChord(log, attributeKey, operator, aggregationFunc, noEnd);
             return new ResponseEntity<>(chordModel.toJSONString(), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();

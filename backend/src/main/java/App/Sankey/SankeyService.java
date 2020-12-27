@@ -24,27 +24,27 @@ import java.util.stream.Collectors;
 @Service
 public class SankeyService {
 
-    public List<SankeyModel> createSankey(XLog log, String attributeKey, String operator, String aggregationFunc){
-        SankeyModel ungroupedSankey = createSankey(log, attributeKey, operator, aggregationFunc, false);
-        SankeyModel groupedSankey = createSankey(log, attributeKey, operator, aggregationFunc, true);
+    public List<SankeyModel> createSankey(XLog log, String attributeKey, String operator, String aggregationFunc, boolean noEnd){
+        SankeyModel ungroupedSankey = createSankey(log, attributeKey, operator, aggregationFunc, false, noEnd);
+        SankeyModel groupedSankey = createSankey(log, attributeKey, operator, aggregationFunc, true, noEnd);
         return List.of(ungroupedSankey, groupedSankey);
     }
 
 
 
-    public SankeyModel createSankey(XLog log, String attributeKey, String operator, String aggregationFunc, boolean grouping) {
+    public SankeyModel createSankey(XLog log, String attributeKey, String operator, String aggregationFunc, boolean grouping, boolean noEnd) {
         RelationToValuesMap relationsToValues = new RelationToValuesMap(attributeKey, operator);
         XEventClassifier classifier = LogProcessor.getClassifier(log);
         if (grouping) {
             TraceGroupsMap groups = findTraceGroups(log, attributeKey, classifier);
             for (XTrace trace : log) {
-                relationsToValues = this.groupedRelationToValues(trace, attributeKey, operator, groups, relationsToValues,classifier);
+                relationsToValues = this.groupedRelationToValues(trace, attributeKey, operator, groups, relationsToValues,classifier, noEnd);
             }
 
         } else {
             for (XTrace trace : log) {
                 relationsToValues = LogProcessor.relationToValues(trace, attributeKey, operator,
-                        true, relationsToValues, classifier);
+                        true, relationsToValues, classifier, noEnd);
             }
         }
 
@@ -74,9 +74,9 @@ public class SankeyService {
 
 
     public RelationToValuesMap groupedRelationToValues(XTrace trace, String attrKey, String operator,
-                                                       TraceGroupsMap groups, RelationToValuesMap relationToValuesMap, XEventClassifier classifier) {
+                                                       TraceGroupsMap groups, RelationToValuesMap relationToValuesMap, XEventClassifier classifier,boolean noEnd) {
         // If trace has 1 event only
-        if (trace.size() <= 1) {
+        if (trace.size() <= 1 && !noEnd) {
             if (!operator.equals("COUNT")) return relationToValuesMap;
             // Creating the link
             XEvent sourceEvent = trace.get(0);
