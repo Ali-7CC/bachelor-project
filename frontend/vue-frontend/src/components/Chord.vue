@@ -136,6 +136,10 @@ export default {
     linksGroup: function () {
       return this.svg.append("g").attr("fill-opacity", 0.8);
     },
+
+    noData: function () {
+      return this.nodes.length === 0 || this.matrix.length === 0;
+    },
   },
 
   methods: {
@@ -302,8 +306,13 @@ export default {
   },
 
   beforeUpdate() {
-    this.updateNodesGroup();
-    this.updateLinksGroup();
+    if (this.noData) {
+      this.nodesGroup.selectAll("*").remove();
+      this.linksGroup.selectAll("*").remove();
+    } else {
+      this.updateNodesGroup();
+      this.updateLinksGroup();
+    }
   },
 };
 </script>

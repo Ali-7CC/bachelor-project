@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 @Service
 public class ChordGenerator {
 
-    public ChordModel createChord(XLog log, String attributeKey, String operator, String aggregationFunc) {
+    public ChordModel createChord(XLog log, String attributeKey, String operator, String aggregationFunc, boolean noEnd) {
         RelationToValuesMap relationsToValues = new RelationToValuesMap(attributeKey, operator);
         XEventClassifier classifier = LogProcessor.getClassifier(log);
         for (XTrace trace : log) {
             relationsToValues = LogProcessor.relationToValues(trace, attributeKey, operator,
-                    false, relationsToValues, classifier);
+                    false, relationsToValues, classifier, noEnd);
         }
 
         HashMap<Relation, Double> links = relationsToValues.aggregate(aggregationFunc);

@@ -26,7 +26,6 @@
 <script>
 import * as d3 from "d3";
 import * as d3Sankey from "d3-sankey";
-
 export default {
   props: ["rawData"],
   data() {
@@ -121,6 +120,13 @@ export default {
         .append("g")
         .attr("fill", "none")
         .attr("stroke-opacity", 0.5);
+    },
+
+    noData: function () {
+      return (
+        this.groupedData.nodes.length === 0 ||
+        this.ungroupedData.nodes.length === 0
+      );
     },
   },
 
@@ -263,9 +269,15 @@ export default {
   },
 
   beforeUpdate() {
-    this.updateNodesGroup();
-    this.updateNamesGroup();
-    this.updateLinksGroup();
+    if (this.noData) {
+      this.nodesGroup.selectAll("*").remove();
+      this.namesGroup.selectAll("*").remove();
+      this.linksGroup.selectAll("*").remove();
+    } else {
+      this.updateNodesGroup();
+      this.updateNamesGroup();
+      this.updateLinksGroup();
+    }
   },
 };
 </script>

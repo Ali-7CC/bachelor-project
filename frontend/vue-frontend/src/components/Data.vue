@@ -39,6 +39,10 @@
         </select>
         <button v-on:click="onDraw">Draw</button>
       </div>
+      <div id="end">
+        <input type="checkbox" id="end" v-model="noEnd" />
+        <label for="end"> Remove singular traces</label>
+      </div>
 
       <div id="slider-container">
         <span id="minus-button">
@@ -102,10 +106,10 @@ export default {
       files: [],
       // Drawing parameters
       selectedFileNameToDraw: "",
-      // selectedPercentage: "",
       selectedAttr: "",
       selectedOp: "",
       selectedAgg: "",
+      noEnd: false,
       sliderPosition: 0,
       // Tabs
       tabs: ["Sankey", "Chord"],
@@ -122,6 +126,7 @@ export default {
           selectedOp: "",
           selectedAgg: "",
           sliderPosition: 0,
+          noEnd: false,
         },
         Chord: {
           selectedFileNameToDraw: "",
@@ -129,6 +134,7 @@ export default {
           selectedOp: "",
           selectedAgg: "",
           sliderPosition: 0,
+          noEnd: false,
         },
       },
     };
@@ -195,6 +201,7 @@ export default {
       this.selectedAttr = this.lastParameters[tab].selectedAttr;
       this.selectedOp = this.lastParameters[tab].selectedOp;
       this.selectedAgg = this.lastParameters[tab].selectedAgg;
+      this.noEnd = this.lastParameters[tab].noEnd;
       this.sliderPosition = this.lastParameters[tab].sliderPosition;
     },
     onFileChange: function () {
@@ -245,11 +252,13 @@ export default {
         payload.append("attributeKey", this.selectedAttr);
         payload.append("operation", this.selectedOp);
         payload.append("aggregationFunc", this.selectedAgg);
+        payload.append("noEnd", this.noEnd);
         if (this.currentTabComponent === "sankey") {
           this.lastParameters.Sankey.selectedFileNameToDraw = this.selectedFileNameToDraw;
           this.lastParameters.Sankey.selectedAttr = this.selectedAttr;
           this.lastParameters.Sankey.selectedOp = this.selectedOp;
           this.lastParameters.Sankey.selectedAgg = this.selectedAgg;
+          this.lastParameters.Sankey.noEnd = this.noEnd;
           this.lastParameters.Sankey.sliderPosition = this.sliderPosition;
           axios
             .post("http://localhost:8080/createSankey", payload)
@@ -261,6 +270,7 @@ export default {
           this.lastParameters.Chord.selectedAttr = this.selectedAttr;
           this.lastParameters.Chord.selectedOp = this.selectedOp;
           this.lastParameters.Chord.selectedAgg = this.selectedAgg;
+          this.lastParameters.Chord.noEnd = this.noEnd;
           this.lastParameters.Chord.sliderPosition = this.sliderPosition;
           axios
             .post("http://localhost:8080/createChord", payload)
@@ -300,6 +310,10 @@ button:focus {
 
 h1 {
   margin: 10px;
+}
+
+#end {
+  margin-left: 5px;
 }
 #upload-container {
   margin: 10px 10px;

@@ -180,9 +180,9 @@ public class LogProcessor {
      */
 
     public static RelationToValuesMap relationToValues(XTrace trace, String attrKey, String operator, boolean duplicates,
-                                                       RelationToValuesMap relationToValuesMap, XEventClassifier classifier) {
+                                                       RelationToValuesMap relationToValuesMap, XEventClassifier classifier,boolean noEnd) {
         // If trace has 1 event only
-        if (trace.size() <= 1) {
+        if (trace.size() <= 1 && !noEnd) {
             if (!operator.equals("COUNT")) return relationToValuesMap;
             // Creating the link
             XEvent sourceEvent = trace.get(0);

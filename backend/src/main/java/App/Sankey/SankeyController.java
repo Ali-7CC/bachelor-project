@@ -29,11 +29,12 @@ public class SankeyController {
     public ResponseEntity<String> createSankey(@RequestParam("fileName") String fileName,
                                                @RequestParam("attributeKey") String attributeKey,
                                                @RequestParam("operation") String operator,
-                                               @RequestParam("aggregationFunc") String aggregationFunc) {
+                                               @RequestParam("aggregationFunc") String aggregationFunc,
+                                               @RequestParam("noEnd") boolean noEnd) {
         try {
             File file = storageService.loadFile(fileName);
             XLog log = storageService.parseFile(file);
-            List<SankeyModel> sankeyModels = sankeyService.createSankey(log, attributeKey, operator, aggregationFunc);
+            List<SankeyModel> sankeyModels = sankeyService.createSankey(log, attributeKey, operator, aggregationFunc, noEnd);
             String body = "{\"ungroupedModel\" : " + sankeyModels.get(0).toJSONString() + " , \"groupedModel\" : "+ sankeyModels.get(1).toJSONString() + "}";
             return new ResponseEntity<>(body, HttpStatus.OK);
         } catch (Exception e) {
