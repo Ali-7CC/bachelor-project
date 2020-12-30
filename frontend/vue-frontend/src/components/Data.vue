@@ -227,15 +227,17 @@ export default {
     onUpload: function () {
       const payload = new FormData();
       payload.append("file", this.selectedFileUpload);
-      axios.post("http://localhost:8080/upload", payload).then((res) => {
-        const newFile = {
-          name: this.selectedFileUpload.name,
-          attributes: res.data.validAttributes,
-          percentages: res.data.percentages,
-        };
-        this.files.push(newFile);
-        this.selectedFileUpload = null;
-      });
+      axios
+        .post(process.env.VUE_APP_BACKEND_API + "/upload", payload)
+        .then((res) => {
+          const newFile = {
+            name: this.selectedFileUpload.name,
+            attributes: res.data.validAttributes,
+            percentages: res.data.percentages,
+          };
+          this.files.push(newFile);
+          this.selectedFileUpload = null;
+        });
     },
 
     onDraw: function () {
@@ -261,7 +263,7 @@ export default {
           this.lastParameters.Sankey.noEnd = this.noEnd;
           this.lastParameters.Sankey.sliderPosition = this.sliderPosition;
           axios
-            .post("http://localhost:8080/createSankey", payload)
+            .post(process.env.VUE_APP_BACKEND_API + "/createSankey", payload)
             .then((res) => {
               this.sankeyData = res.data;
             });
@@ -273,7 +275,7 @@ export default {
           this.lastParameters.Chord.noEnd = this.noEnd;
           this.lastParameters.Chord.sliderPosition = this.sliderPosition;
           axios
-            .post("http://localhost:8080/createChord", payload)
+            .post(process.env.VUE_APP_BACKEND_API + "/createChord", payload)
             .then((res) => {
               this.chordData = res.data;
             });
