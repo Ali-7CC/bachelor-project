@@ -32,7 +32,7 @@
             <artifactId>openxes</artifactId>
             <version>2.26</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/src/lib/OpenXES-20181205.jar</systemPath>
+            <systemPath>${pom.basedir}/src/lib/OpenXES-20181205.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -40,7 +40,7 @@
             <artifactId>spex</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/src/lib/Spex.jar</systemPath>
+            <systemPath>${pom.basedir}/src/lib/Spex.jar</systemPath>
         </dependency>
 
 
@@ -67,15 +67,10 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <archive>
-                        <addClasspath>true</addClasspath>
-                        <classpathPrefix>lib/</classpathPrefix>
-                        <mainClass>App.App</mainClass>
-                    </archive>
+                    <includeSystemScope>true</includeSystemScope>
                 </configuration>
             </plugin>
         </plugins>
