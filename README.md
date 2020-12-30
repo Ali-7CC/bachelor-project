@@ -21,9 +21,9 @@ java -jar target/bachelor-project-backend-1.0-SNAPSHOT.jar
 Make sure that the backend is running on port 8080
 
 ## Running the frontend
-To install the frontend packages, navigate to the `frontend` folder from your command line interpreter and  run:
+To install the frontend packages, navigate to the `frontend/vue-frontend` folder from your command line interpreter and  run:
 ```
-npm run install
+npm install
 ```
 After the installation, start the frontend by running:
 ```
