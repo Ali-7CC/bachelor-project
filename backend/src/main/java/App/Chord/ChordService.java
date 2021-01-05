@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  */
 
 @Service
-public class ChordGenerator {
+public class ChordService {
 
     public ChordModel createChord(XLog log, String attributeKey, String operator, String aggregationFunc, boolean noEnd) {
         RelationToValuesMap relationsToValues = new RelationToValuesMap(attributeKey, operator);

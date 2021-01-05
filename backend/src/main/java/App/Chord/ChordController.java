@@ -15,13 +15,13 @@ import java.io.File;
 @RestController
 public class ChordController {
     private final FileStorageService storageService;
-    private final ChordGenerator chordGenerator;
+    private final ChordService chordService;
 
 
     @Autowired
-    public ChordController(FileStorageService storageService, ChordGenerator chordGenerator) {
+    public ChordController(FileStorageService storageService, ChordService chordService) {
         this.storageService = storageService;
-        this.chordGenerator = chordGenerator;
+        this.chordService = chordService;
     }
 
     @CrossOrigin
@@ -34,7 +34,7 @@ public class ChordController {
         try {
             File file = storageService.loadFile(fileName);
             XLog log = storageService.parseFile(file);
-            ChordModel chordModel = chordGenerator.createChord(log, attributeKey, operator, aggregationFunc, noEnd);
+            ChordModel chordModel = chordService.createChord(log, attributeKey, operator, aggregationFunc, noEnd);
             return new ResponseEntity<>(chordModel.toJSONString(), HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
