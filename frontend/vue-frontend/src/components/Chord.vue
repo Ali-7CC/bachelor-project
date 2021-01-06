@@ -300,6 +300,7 @@ export default {
         k = (endAngle - startAngle) / value; // (arc degrees)/group value = tick position/angle?}
       }
       return d3.range(0, value, this.tickStep).map((value) => {
+        value = Number(value.toFixed(2));
         return { index: group.index, value, angle: value * k + startAngle };
       });
     },
@@ -310,6 +311,9 @@ export default {
       this.nodesGroup.selectAll("*").remove();
       this.linksGroup.selectAll("*").remove();
     } else {
+      // Temp hack until the ticks bug is fixed
+      this.nodesGroup.selectAll("*").remove();
+      this.linksGroup.selectAll("*").remove();
       this.updateNodesGroup();
       this.updateLinksGroup();
     }
