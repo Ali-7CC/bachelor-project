@@ -1,5 +1,7 @@
 package App.Shared;
 
+import org.apache.juli.logging.Log;
+import org.deckfour.xes.classification.XEventClassifier;
 import org.deckfour.xes.factory.XFactoryBufferedImpl;
 import org.deckfour.xes.in.XesXmlParser;
 import org.deckfour.xes.model.XEvent;
@@ -10,7 +12,9 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -72,34 +76,84 @@ public class LogProcessorTest {
 
     @Test
     public void getClassifier() {
+        XEventClassifier activityClassifier = LogProcessor.getClassifier(testLog);
+        assertEquals(activityClassifier, testLog.getClassifiers().get(0));
 
     }
 
     @Test
     public void sameTrace() {
+        boolean sameTrace = LogProcessor.sameTrace(testLog, testLog.get(0), testLog.get(0));
+        boolean differentTrace = LogProcessor.sameTrace(testLog, testLog.get(0), testLog.get(1));
+
+        assertTrue(sameTrace);
+        assertTrue(!differentTrace);
     }
 
     @Test
     public void findVariants() {
+        VariantMap smallVariantMap = LogProcessor.findVariants(smallLog);
+        assertEquals(2, smallVariantMap.variants.size());
+
+
+        VariantMap variantMap = LogProcessor.findVariants(testLog);
+        assertEquals(20, variantMap.variants.size());
+
+
     }
 
-    @Test
-    public void combineTraces() {
-    }
 
     @Test
     public void combineVariants() {
+        VariantMap smallVariantMap = LogProcessor.findVariants(smallLog);
+        List<Variant> variants = smallVariantMap.variants.values().stream().collect(Collectors.toList());
+        HashMap<Double, XLog>  combineVariants = LogProcessor.combineVariants(variants, smallLog);
+        double percentage = combineVariants.keySet().iterator().next();
+        assertEquals(1.0,percentage, 0);
+
     }
 
     @Test
     public void createSubLogs() {
+        VariantMap smallVariantMap = LogProcessor.findVariants(smallLog);
+        HashMap<Double, XLog> sublogs = LogProcessor.createSubLogs(smallLog, smallVariantMap);
+        assertEquals(2, sublogs.size());
+        assertTrue(sublogs.containsKey(0.5));
+        assertTrue(sublogs.containsKey(1.0));
+
     }
 
     @Test
     public void relationToValues() {
+        RelationToValuesMap relationToValuesMap = new RelationToValuesMap("Activity", "COUNT");
+
+        relationToValuesMap = LogProcessor.relationToValues(smallLog.get(0), "Activity", "COUNT",
+                false, relationToValuesMap, smallLog.getClassifiers().get(0), false);
+
+        List<String> firstRelationNames = new ArrayList<>();
+        firstRelationNames.add("Inbound Call");
+        firstRelationNames.add("Handle Case");
+        Relation firstRelation = new Relation();
+        firstRelation.eventNames = firstRelationNames;
+
+
+        List<String> secondRelationNames = new ArrayList<>();
+        secondRelationNames.add("Handle Case");
+        secondRelationNames.add("Call Outbound");
+        Relation secondRelation = new Relation();
+        secondRelation.eventNames = secondRelationNames;
+
+
+        assertTrue(relationToValuesMap.map.containsKey(secondRelation));
+
     }
 
     @Test
     public void round() {
+        double roundedNumber = LogProcessor.round(3.1415, 2);
+        assertEquals(3.14, roundedNumber, 0);
+
+        double roundedNumber2 = LogProcessor.round(3.99999, 2);
+        assertEquals(4.0, roundedNumber2, 0);
     }
 }
