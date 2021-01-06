@@ -114,7 +114,7 @@ export default {
      * returns a float that represents the step amount
      */
     tickStep: function () {
-      return Number(d3.tickStep(0, d3.sum(this.matrix.flat()), 10)).toFixed(2);
+      return d3.tickStep(0, d3.sum(this.matrix.flat()), 10);
     },
 
     /**
