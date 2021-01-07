@@ -18,7 +18,7 @@ After the installation, you can start the backend by running:
 java -jar target/bachelor-project-backend-1.0-SNAPSHOT.jar
 ```
 
-Make sure that the backend is running on port 8080
+Make sure that the backend is running on port 8080. If your 8080 port is busy, you can change the port number in `frontend/vue-frontend/.env.development` to the number that the backend is using.
 
 ## Running the frontend
 To install the frontend packages, navigate to the `frontend/vue-frontend` folder from your command line interpreter and  run:
@@ -32,3 +32,5 @@ npm run serve
 
 ## Usage
 You can try out the tool using the example log in `log/call_center_log.xes`.
+### Example relation definition combinations:
+- Activity frequency: `Attribute = Activity`, `Operation = COUNT`, `Aggregation = SUM`
