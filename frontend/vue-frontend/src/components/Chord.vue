@@ -13,6 +13,7 @@
 
 <script>
 import * as d3 from "d3";
+// Credit for some functions: https://observablehq.com/@d3/chord-diagram
 export default {
   props: ["rawData"],
   data() {

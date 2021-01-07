@@ -1,0 +1,2 @@
+An example event log for a call center.
+Source: Comes with the Disco installation: https://fluxicon.com/disco/

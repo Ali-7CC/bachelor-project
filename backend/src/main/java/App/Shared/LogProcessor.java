@@ -298,7 +298,7 @@ public class LogProcessor {
         }
 
     }
-
+    // Credit: https://www.baeldung.com/java-round-decimal-number
     public static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
 

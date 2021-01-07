@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 /**
  * Handles file uploading
+ * Credit: https://spring.io/guides/gs/uploading-files/
  */
 @Service
 public class FileStorageService {
