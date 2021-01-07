@@ -4,7 +4,7 @@ Developed for my bachelor project - Jan 2021
 ## Installation
 ### Prerequisites
 Make sure to have the following prerequisites installed:
-- Java 11
+- Java 11 SDK
 - npm
 - maven
 
@@ -33,4 +33,6 @@ npm run serve
 ## Usage
 You can try out the tool using the example log in `log/call_center_log.xes`.
 ### Example relation definition combinations:
-- Activity frequency: `Attribute = Activity`, `Operation = COUNT`, `Aggregation = SUM`
+- Activity frequency: `Attribute = Activity`, `Operation = COUNT`, `Aggregation = Sum`
+- Average time between activities: `Attribute = time:timestamp`, `Operation = Difference`, `Aggregation = Average`
+
