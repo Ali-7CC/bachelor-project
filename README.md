@@ -1,7 +1,7 @@
 # Web-Based Application for Visualization of Process Data
 Developed for my bachelor project - Jan 2021
 
-## Usage
+## Installation
 ### Prerequisites
 Make sure to have the following prerequisites installed:
 - Java 11
@@ -29,3 +29,6 @@ After the installation, start the frontend by running:
 ```
 npm run serve
 ```
+
+## Usage
+You can try out the tool using the example log in `log/call_center_log.xes`.
