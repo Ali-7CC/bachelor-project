@@ -206,7 +206,7 @@ export default {
         .attr("dy", "0.35em")
         // Tags the labels with eitehr "start" or "end" based on their position
         .attr("text-anchor", (d) => (d.x0 < this.WIDTH / 2 ? "start" : "end"))
-        .text((d) => d.name.split("_")[0]);
+        .text((d) => d.name.split(/_[0-9]/)[0]);
     },
 
     /**
