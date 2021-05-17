@@ -1,5 +1,6 @@
 # Web-Based Application for Visualization of Process Data
-Developed for my bachelor project - Jan 2021
+Developed for my bachelor project - Jan 2021.
+Paper: https://findit.dtu.dk/en/catalog/2612279097
 
 ## Installation
 ### Prerequisites
